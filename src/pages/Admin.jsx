@@ -1269,7 +1269,7 @@ function Admin() {
       )}
 
         </div>{/* end admin-body */}
-      </div>{/* end admin-content */}
+      </main>{/* end admin-content */}
     </div>
   );
 }
