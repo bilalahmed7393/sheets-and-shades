@@ -37,8 +37,22 @@ function Admin() {
   }, [settings]);
 
   const [formData, setFormData] = useState({
-    name: '', category: 'Bedsheets', condition: 'New',
-    price: '', image: '', description: ''
+    name: '',
+    category: 'Bedsheets',
+    condition: 'New',
+    price: '',
+    salePrice: '',
+    image: '',
+    images: [],
+    description: '',
+    sku: '',
+    stockQuantity: '50',
+    material: '',
+    sizes: [],
+    colors: [],
+    badge: 'None',
+    isFeatured: false,
+    isActive: true
   });
 
   useEffect(() => {
@@ -126,47 +140,70 @@ function Admin() {
   // Modal helpers
   const openAddModal = () => {
     setEditingProduct(null);
-    setFormData({ name: '', category: 'Bedsheets', condition: 'New', price: '', image: '', description: '' });
+    setFormData({
+      name: '',
+      category: 'Bedsheets',
+      condition: 'New',
+      price: '',
+      salePrice: '',
+      image: '',
+      images: [],
+      description: '',
+      sku: '',
+      stockQuantity: '50',
+      material: '',
+      sizes: [],
+      colors: [],
+      badge: 'None',
+      isFeatured: false,
+      isActive: true
+    });
     setShowModal(true);
   };
 
-  const handleImageUpload = (e) => {
-    const file = e.target.files[0];
-    if (!file) return;
+  const handleImageUpload = (e, isGallery = false) => {
+    const files = Array.from(e.target.files);
+    if (files.length === 0) return;
 
-    const reader = new FileReader();
-    reader.readAsDataURL(file);
-    reader.onload = (event) => {
-      const img = new Image();
-      img.src = event.target.result;
-      img.onload = () => {
-        const canvas = document.createElement('canvas');
-        const MAX_WIDTH = 800;
-        const MAX_HEIGHT = 800;
-        let width = img.width;
-        let height = img.height;
+    files.forEach(file => {
+      const reader = new FileReader();
+      reader.readAsDataURL(file);
+      reader.onload = (event) => {
+        const img = new Image();
+        img.src = event.target.result;
+        img.onload = () => {
+          const canvas = document.createElement('canvas');
+          const MAX_WIDTH = 800;
+          const MAX_HEIGHT = 800;
+          let width = img.width;
+          let height = img.height;
 
-        if (width > height) {
-          if (width > MAX_WIDTH) {
-            height *= MAX_WIDTH / width;
-            width = MAX_WIDTH;
+          if (width > height) {
+            if (width > MAX_WIDTH) {
+              height *= MAX_WIDTH / width;
+              width = MAX_WIDTH;
+            }
+          } else {
+            if (height > MAX_HEIGHT) {
+              width *= MAX_HEIGHT / height;
+              height = MAX_HEIGHT;
+            }
           }
-        } else {
-          if (height > MAX_HEIGHT) {
-            width *= MAX_HEIGHT / height;
-            height = MAX_HEIGHT;
+
+          canvas.width = width;
+          canvas.height = height;
+          const ctx = canvas.getContext('2d');
+          ctx.drawImage(img, 0, 0, width, height);
+
+          const dataUrl = canvas.toDataURL('image/jpeg', 0.8);
+          if (isGallery) {
+            setFormData(prev => ({ ...prev, images: [...prev.images, dataUrl] }));
+          } else {
+            setFormData(prev => ({ ...prev, image: dataUrl }));
           }
-        }
-
-        canvas.width = width;
-        canvas.height = height;
-        const ctx = canvas.getContext('2d');
-        ctx.drawImage(img, 0, 0, width, height);
-
-        const dataUrl = canvas.toDataURL('image/jpeg', 0.8);
-        setFormData({ ...formData, image: dataUrl });
+        };
       };
-    };
+    });
   };
 
   const openEditModal = (product) => {
@@ -176,8 +213,18 @@ function Admin() {
       category: product.category,
       condition: product.condition,
       price: product.price.toString(),
+      salePrice: product.salePrice?.toString() || '',
       image: product.image,
-      description: product.description
+      images: product.images || [],
+      description: product.description || '',
+      sku: product.sku || '',
+      stockQuantity: product.stockQuantity?.toString() || '0',
+      material: product.material || '',
+      sizes: product.sizes || [],
+      colors: product.colors || [],
+      badge: product.badge || 'None',
+      isFeatured: product.isFeatured || false,
+      isActive: product.isActive !== undefined ? product.isActive : true
     });
     setShowModal(true);
   };
@@ -187,22 +234,56 @@ function Admin() {
     setEditingProduct(null);
   };
 
+  const toggleSize = (size) => {
+    setFormData(prev => {
+      const sizes = prev.sizes.includes(size)
+        ? prev.sizes.filter(s => s !== size)
+        : [...prev.sizes, size];
+      return { ...prev, sizes };
+    });
+  };
+
+  const addColor = (e) => {
+    if (e.key === 'Enter' && e.target.value.trim()) {
+      e.preventDefault();
+      const color = e.target.value.trim();
+      if (!formData.colors.includes(color)) {
+        setFormData(prev => ({ ...prev, colors: [...prev.colors, color] }));
+      }
+      e.target.value = '';
+    }
+  };
+
+  const removeColor = (color) => {
+    setFormData(prev => ({ ...prev, colors: prev.colors.filter(c => c !== color) }));
+  };
+
+  const removeGalleryImage = (index) => {
+    setFormData(prev => ({ ...prev, images: prev.images.filter((_, i) => i !== index) }));
+  };
+
   // CRUD
   const handleSave = async (e) => {
     e.preventDefault();
     if (!formData.name || !formData.price) return;
 
     try {
+      const formattedData = {
+        ...formData,
+        price: parseFloat(formData.price),
+        salePrice: formData.salePrice ? parseFloat(formData.salePrice) : 0,
+        stockQuantity: parseInt(formData.stockQuantity) || 0
+      };
+
       if (editingProduct) {
-        const productToUpdate = { ...editingProduct, ...formData, price: parseFloat(formData.price) };
+        const productToUpdate = { ...editingProduct, ...formattedData };
         const updatedProduct = await updateProduct(productToUpdate);
         setProducts(products.map(p => p.id === updatedProduct.id ? updatedProduct : p));
         showToast(`"${formData.name}" updated successfully`);
       } else {
         const newProduct = {
           id: getNextId(products),
-          ...formData,
-          price: parseFloat(formData.price)
+          ...formattedData
         };
         const savedProduct = await addProduct(newProduct);
         setProducts([...products, savedProduct]);
@@ -427,9 +508,10 @@ function Admin() {
               <thead>
                 <tr>
                   <th>Product</th>
-                  <th>Category</th>
-                  <th>Condition</th>
+                  <th>SKU</th>
+                  <th>Stock</th>
                   <th>Price</th>
+                  <th>Status</th>
                   <th>Actions</th>
                 </tr>
               </thead>
@@ -441,21 +523,34 @@ function Admin() {
                         <img src={product.image} alt={product.name} className="table-product-thumb" />
                         <div>
                           <div className="table-product-name">{product.name}</div>
-                          <div className="table-product-desc">{product.description}</div>
+                          <div style={{ display: 'flex', gap: '0.4rem', marginTop: '0.2rem' }}>
+                            <span className="table-badge new">{product.category}</span>
+                            {product.badge !== 'None' && <span className="table-badge gold">{product.badge}</span>}
+                          </div>
                         </div>
                       </div>
                     </td>
+                    <td style={{ fontFamily: 'monospace', fontSize: '0.85rem' }}>{product.sku || 'N/A'}</td>
                     <td>
-                      <span className={`table-badge ${product.category.toLowerCase()}`}>
-                        {product.category}
+                      <span className={`status-badge ${product.stockQuantity > 10 ? 'delivered' : 'cancelled'}`}>
+                        {product.stockQuantity}
                       </span>
                     </td>
                     <td>
-                      <span className={`table-badge ${product.condition === 'New' ? 'new' : 'preloved'}`}>
-                        {product.condition}
+                      {product.salePrice > 0 ? (
+                        <div>
+                          <div style={{ color: '#b5941f', fontWeight: '700' }}>PKR {product.salePrice}</div>
+                          <div style={{ color: '#8b8e96', fontSize: '0.75rem', textDecoration: 'line-through' }}>PKR {product.price}</div>
+                        </div>
+                      ) : (
+                        <div style={{ fontWeight: '600' }}>PKR {product.price}</div>
+                      )}
+                    </td>
+                    <td>
+                      <span className={`status-badge ${product.isActive ? 'delivered' : 'cancelled'}`}>
+                        {product.isActive ? 'Active' : 'Draft'}
                       </span>
                     </td>
-                    <td className="table-price">${product.price}</td>
                     <td>
                       <div className="table-actions">
                         <button className="table-action-btn" onClick={() => openEditModal(product)} title="Edit">
@@ -537,17 +632,17 @@ function Admin() {
                             </div>
                           </td>
                           <td>{item.quantity}</td>
-                          <td className="table-price">${item.price.toFixed(2)}</td>
-                          <td className="table-price">${(item.price * item.quantity).toFixed(2)}</td>
+                          <td className="table-price">PKR {item.price.toLocaleString()}</td>
+                          <td className="table-price">PKR {(item.price * item.quantity).toLocaleString()}</td>
                         </tr>
                       ))}
                     </tbody>
                   </table>
                 </div>
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: '1.5rem', paddingTop: '1rem', borderTop: '1px solid #2d3039' }}>
-                  <span style={{ fontSize: '1.2rem', fontWeight: 700, color: '#c9a96e' }}>Total: ${selectedOrder.total.toFixed(2)}</span>
-                  <button className="admin-icon-btn danger" onClick={() => handleDeleteOrder(selectedOrder._id)}>
-                    <Trash2 size={16} /> Delete Order
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: '1.5rem', paddingTop: '1rem', borderTop: '1px solid #21262d' }}>
+                  <span style={{ fontSize: '1.2rem', fontWeight: 700, color: '#b5941f' }}>Total: PKR {selectedOrder.total.toLocaleString()}</span>
+                  <button className="btn-admin secondary" onClick={() => setSelectedOrder(null)}>
+                    Close Details
                   </button>
                 </div>
               </div>
@@ -568,15 +663,15 @@ function Admin() {
                   <tbody>
                     {orders.map(order => (
                       <tr key={order._id}>
-                        <td style={{ fontWeight: 600, color: '#c9a96e', fontSize: '0.85rem' }}>{order.orderNumber}</td>
+                        <td style={{ fontWeight: 600, color: '#b5941f', fontSize: '0.85rem' }}>{order.orderNumber}</td>
                         <td>
                           <div className="table-product-name">{order.customerName}</div>
-                          <div className="table-product-desc">{order.customerEmail}</div>
+                          <div className="table-product-desc">{order.customerCity}</div>
                         </td>
                         <td>{order.items.reduce((sum, item) => sum + item.quantity, 0)} items</td>
-                        <td className="table-price">${order.total.toFixed(2)}</td>
+                        <td className="table-price">PKR {order.total.toLocaleString()}</td>
                         <td>
-                          <span className={`table-badge ${order.status === 'Pending' ? 'preloved' : order.status === 'Delivered' ? 'new' : order.status === 'Cancelled' ? '' : 'bedsheets'}`}>
+                          <span className={`status-badge ${order.status.toLowerCase()}`}>
                             {order.status}
                           </span>
                         </td>
@@ -609,100 +704,199 @@ function Admin() {
         {/* WEBSITE CONTENT */}
         {activeTab === 'settings' && (
           <div className="settings-panel">
-            <h2>Edit Website Content</h2>
+            <h2>Website Content Management</h2>
             <form onSubmit={handleSettingsSave} className="settings-form">
-              <div className="form-group">
-                <label>Website Name</label>
-                <input type="text" value={settingsForm.siteName} onChange={e => setSettingsForm({...settingsForm, siteName: e.target.value})} required />
-              </div>
-              <div className="form-group">
-                <label>Hero Headline</label>
-                <input type="text" value={settingsForm.heroHeadline} onChange={e => setSettingsForm({...settingsForm, heroHeadline: e.target.value})} required />
-              </div>
-              <div className="form-group">
-                <label>Hero Subtitle</label>
-                <textarea value={settingsForm.heroSubtitle} onChange={e => setSettingsForm({...settingsForm, heroSubtitle: e.target.value})} required />
-              </div>
-              <div className="form-group">
-                <label>About Us / Footer Text</label>
-                <textarea value={settingsForm.aboutText} onChange={e => setSettingsForm({...settingsForm, aboutText: e.target.value})} required />
-              </div>
-              <div className="form-group">
-                <label>Logo Image</label>
-                <input type="file" accept="image/*" onChange={(e) => handleSettingsImageUpload(e, 'logoImage')} />
-                {settingsForm.logoImage && (
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', marginTop: '0.75rem' }}>
-                    <img src={settingsForm.logoImage} alt="Logo Preview" style={{ height: '60px', objectFit: 'contain' }} />
-                    <button type="button" className="admin-icon-btn danger" onClick={() => setSettingsForm({...settingsForm, logoImage: ''})} style={{ fontSize: '0.8rem' }}>
-                      <Trash2 size={14} /> Remove Logo
-                    </button>
+              
+              <div className="admin-section-box">
+                <h3 className="section-title">Announcement Bar</h3>
+                <div className="form-group-v2">
+                  <div className="toggle-row">
+                    <div className="toggle-switch">
+                      <input 
+                        type="checkbox" 
+                        checked={settingsForm.showAnnouncement} 
+                        onChange={e => setSettingsForm({...settingsForm, showAnnouncement: e.target.checked})} 
+                      />
+                      <span className="toggle-slider"></span>
+                    </div>
+                    <span>Show Announcement Bar?</span>
                   </div>
-                )}
-              </div>
-              <div className="form-group">
-                <label>Hero Background Image</label>
-                <input type="file" accept="image/*" onChange={(e) => handleSettingsImageUpload(e, 'heroBackgroundImage')} />
-                {settingsForm.heroBackgroundImage && <img src={settingsForm.heroBackgroundImage} alt="Hero Preview" className="image-preview" />}
-              </div>
-              <div className="form-group">
-                <label>Category 1 Image (Bedsheets)</label>
-                <input type="file" accept="image/*" onChange={(e) => handleSettingsImageUpload(e, 'categoryImage1')} />
-                {settingsForm.categoryImage1 && <img src={settingsForm.categoryImage1} alt="Category 1 Preview" className="image-preview" />}
-              </div>
-              <div className="form-group">
-                <label>Category 2 Image (Curtains)</label>
-                <input type="file" accept="image/*" onChange={(e) => handleSettingsImageUpload(e, 'categoryImage2')} />
-                {settingsForm.categoryImage2 && <img src={settingsForm.categoryImage2} alt="Category 2 Preview" className="image-preview" />}
+                </div>
+                <div className="form-group">
+                  <label>Announcement Text</label>
+                  <input type="text" value={settingsForm.announcementText || ''} onChange={e => setSettingsForm({...settingsForm, announcementText: e.target.value})} placeholder="e.g. Free shipping on orders over PKR 5000!" />
+                </div>
               </div>
 
-              <h2 style={{ marginTop: '2rem' }}>Theme & Colors</h2>
-              <div className="form-grid">
-                <div className="form-group">
-                  <label>Primary Color (Buttons & Accents)</label>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
-                    <input type="color" value={settingsForm.primaryColor || '#8b7355'} onChange={e => setSettingsForm({...settingsForm, primaryColor: e.target.value})} style={{ width: '48px', height: '48px', border: 'none', background: 'none', cursor: 'pointer', padding: 0 }} />
-                    <input type="text" value={settingsForm.primaryColor || '#8b7355'} onChange={e => setSettingsForm({...settingsForm, primaryColor: e.target.value})} style={{ flex: 1 }} />
+              <div className="admin-section-box">
+                <h3 className="section-title">Navbar & Branding</h3>
+                <div className="form-grid">
+                  <div className="form-group">
+                    <label>Logo Image</label>
+                    <input type="file" accept="image/*" onChange={(e) => handleSettingsImageUpload(e, 'logoImage')} />
+                    {settingsForm.logoImage && (
+                      <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', marginTop: '0.75rem' }}>
+                        <img src={settingsForm.logoImage} alt="Logo" style={{ height: '40px', objectFit: 'contain' }} />
+                        <button type="button" className="btn-icon danger" onClick={() => setSettingsForm({...settingsForm, logoImage: ''})}>
+                          <Trash2 size={14} />
+                        </button>
+                      </div>
+                    )}
+                  </div>
+                  <div className="form-group">
+                    <label>Site Name</label>
+                    <input type="text" value={settingsForm.siteName} onChange={e => setSettingsForm({...settingsForm, siteName: e.target.value})} required />
                   </div>
                 </div>
-                <div className="form-group">
-                  <label>Secondary Color (Badges & Tags)</label>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
-                    <input type="color" value={settingsForm.secondaryColor || '#8f9779'} onChange={e => setSettingsForm({...settingsForm, secondaryColor: e.target.value})} style={{ width: '48px', height: '48px', border: 'none', background: 'none', cursor: 'pointer', padding: 0 }} />
-                    <input type="text" value={settingsForm.secondaryColor || '#8f9779'} onChange={e => setSettingsForm({...settingsForm, secondaryColor: e.target.value})} style={{ flex: 1 }} />
-                  </div>
-                </div>
-                <div className="form-group">
-                  <label>Background Color</label>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
-                    <input type="color" value={settingsForm.backgroundColor || '#faf9f6'} onChange={e => setSettingsForm({...settingsForm, backgroundColor: e.target.value})} style={{ width: '48px', height: '48px', border: 'none', background: 'none', cursor: 'pointer', padding: 0 }} />
-                    <input type="text" value={settingsForm.backgroundColor || '#faf9f6'} onChange={e => setSettingsForm({...settingsForm, backgroundColor: e.target.value})} style={{ flex: 1 }} />
-                  </div>
-                </div>
-                <div className="form-group">
-                  <label>Text Color</label>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
-                    <input type="color" value={settingsForm.textColor || '#2c302e'} onChange={e => setSettingsForm({...settingsForm, textColor: e.target.value})} style={{ width: '48px', height: '48px', border: 'none', background: 'none', cursor: 'pointer', padding: 0 }} />
-                    <input type="text" value={settingsForm.textColor || '#2c302e'} onChange={e => setSettingsForm({...settingsForm, textColor: e.target.value})} style={{ flex: 1 }} />
+                <div className="form-group-v2" style={{ marginTop: '1rem' }}>
+                  <div className="toggle-row">
+                    <div className="toggle-switch">
+                      <input 
+                        type="checkbox" 
+                        checked={settingsForm.showWhatsApp} 
+                        onChange={e => setSettingsForm({...settingsForm, showWhatsApp: e.target.checked})} 
+                      />
+                      <span className="toggle-slider"></span>
+                    </div>
+                    <span>Show WhatsApp Floating Button?</span>
                   </div>
                 </div>
               </div>
 
-              <h2 style={{ marginTop: '2rem' }}>Support Pages</h2>
-              <p style={{ color: '#8b8e96', fontSize: '0.85rem', marginBottom: '1rem' }}>Edit the content for your FAQ, Shipping, and Contact pages. You can use basic HTML tags like &lt;h3&gt;, &lt;p&gt;, &lt;ul&gt;, &lt;li&gt;, &lt;strong&gt;, &lt;br&gt; for formatting.</p>
-              <div className="form-group">
-                <label>FAQ Page Content</label>
-                <textarea value={settingsForm.faqContent || ''} onChange={e => setSettingsForm({...settingsForm, faqContent: e.target.value})} rows={10} style={{ fontFamily: 'monospace', fontSize: '0.85rem' }} />
-              </div>
-              <div className="form-group">
-                <label>Shipping & Returns Page Content</label>
-                <textarea value={settingsForm.shippingContent || ''} onChange={e => setSettingsForm({...settingsForm, shippingContent: e.target.value})} rows={10} style={{ fontFamily: 'monospace', fontSize: '0.85rem' }} />
-              </div>
-              <div className="form-group">
-                <label>Contact Us Page Content</label>
-                <textarea value={settingsForm.contactContent || ''} onChange={e => setSettingsForm({...settingsForm, contactContent: e.target.value})} rows={10} style={{ fontFamily: 'monospace', fontSize: '0.85rem' }} />
+              <div className="admin-section-box">
+                <h3 className="section-title">Hero Section</h3>
+                <div className="form-group">
+                  <label>Hero Background Image</label>
+                  <input type="file" accept="image/*" onChange={(e) => handleSettingsImageUpload(e, 'heroBackgroundImage')} />
+                  {settingsForm.heroBackgroundImage && <img src={settingsForm.heroBackgroundImage} alt="Hero Preview" className="image-preview" style={{ height: '150px', width: '100%', objectFit: 'cover', borderRadius: '0.5rem', marginTop: '0.75rem' }} />}
+                </div>
+                <div className="form-group">
+                  <label>Hero Headline</label>
+                  <input type="text" value={settingsForm.heroHeadline} onChange={e => setSettingsForm({...settingsForm, heroHeadline: e.target.value})} required />
+                </div>
+                <div className="form-group">
+                  <label>Hero Subtitle</label>
+                  <textarea value={settingsForm.heroSubtitle} onChange={e => setSettingsForm({...settingsForm, heroSubtitle: e.target.value})} required />
+                </div>
+                <div className="form-grid">
+                  <div className="form-group">
+                    <label>CTA Button 1 Text</label>
+                    <input type="text" value={settingsForm.heroCta1Text || ''} onChange={e => setSettingsForm({...settingsForm, heroCta1Text: e.target.value})} />
+                  </div>
+                  <div className="form-group">
+                    <label>CTA Button 1 Link</label>
+                    <input type="text" value={settingsForm.heroCta1Link || ''} onChange={e => setSettingsForm({...settingsForm, heroCta1Link: e.target.value})} />
+                  </div>
+                </div>
               </div>
 
-              <button type="submit" className="btn btn-primary">Save Content</button>
+              <div className="admin-section-box">
+                <h3 className="section-title">Support Pages Content</h3>
+                <p style={{ color: '#8b8e96', fontSize: '0.85rem', marginBottom: '1.5rem' }}>Use basic HTML tags for formatting if needed.</p>
+                <div className="form-group">
+                  <label>FAQ Content</label>
+                  <textarea value={settingsForm.faqContent || ''} onChange={e => setSettingsForm({...settingsForm, faqContent: e.target.value})} rows={6} />
+                </div>
+                <div className="form-group">
+                  <label>Shipping & Returns Content</label>
+                  <textarea value={settingsForm.shippingContent || ''} onChange={e => setSettingsForm({...settingsForm, shippingContent: e.target.value})} rows={6} />
+                </div>
+                <div className="form-group">
+                  <label>Contact Content</label>
+                  <textarea value={settingsForm.contactContent || ''} onChange={e => setSettingsForm({...settingsForm, contactContent: e.target.value})} rows={6} />
+                </div>
+              </div>
+
+              <div style={{ display: 'flex', justifyContent: 'flex-end', marginTop: '2rem' }}>
+                <button type="submit" className="btn-admin primary" style={{ padding: '0.8rem 2.5rem' }}>Save All Changes</button>
+              </div>
+            </form>
+          </div>
+        )}
+
+        {/* STORE SETTINGS */}
+        {activeTab === 'storeSettings' && (
+          <div className="settings-panel">
+            <h2>Store Settings</h2>
+            <form onSubmit={handleSettingsSave} className="settings-form">
+              
+              <div className="admin-section-box">
+                <h3 className="section-title">Contact Information</h3>
+                <div className="form-grid">
+                  <div className="form-group">
+                    <label>Contact Email</label>
+                    <input type="email" value={settingsForm.contactEmail || ''} onChange={e => setSettingsForm({...settingsForm, contactEmail: e.target.value})} />
+                  </div>
+                  <div className="form-group">
+                    <label>Contact Phone</label>
+                    <input type="text" value={settingsForm.contactPhone || ''} onChange={e => setSettingsForm({...settingsForm, contactPhone: e.target.value})} />
+                  </div>
+                  <div className="form-group">
+                    <label>WhatsApp Number (with country code)</label>
+                    <input type="text" value={settingsForm.whatsappNumber || ''} onChange={e => setSettingsForm({...settingsForm, whatsappNumber: e.target.value})} placeholder="e.g. 923001234567" />
+                  </div>
+                  <div className="form-group">
+                    <label>Store Address</label>
+                    <input type="text" value={settingsForm.storeAddress || ''} onChange={e => setSettingsForm({...settingsForm, storeAddress: e.target.value})} />
+                  </div>
+                </div>
+              </div>
+
+              <div className="admin-section-box">
+                <h3 className="section-title">Social Media Links</h3>
+                <div className="form-grid">
+                  <div className="form-group">
+                    <label>Facebook URL</label>
+                    <input type="text" value={settingsForm.facebookUrl || ''} onChange={e => setSettingsForm({...settingsForm, facebookUrl: e.target.value})} />
+                  </div>
+                  <div className="form-group">
+                    <label>Instagram URL</label>
+                    <input type="text" value={settingsForm.instagramUrl || ''} onChange={e => setSettingsForm({...settingsForm, instagramUrl: e.target.value})} />
+                  </div>
+                  <div className="form-group">
+                    <label>Tiktok URL</label>
+                    <input type="text" value={settingsForm.tiktokUrl || ''} onChange={e => setSettingsForm({...settingsForm, tiktokUrl: e.target.value})} />
+                  </div>
+                </div>
+              </div>
+
+              <div className="admin-section-box">
+                <h3 className="section-title">Theme & Design Tokens</h3>
+                <div className="form-grid">
+                  <div className="form-group">
+                    <label>Primary Brand Color</label>
+                    <div style={{ display: 'flex', gap: '0.5rem' }}>
+                      <input type="color" value={settingsForm.primaryColor || '#2d6a4f'} onChange={e => setSettingsForm({...settingsForm, primaryColor: e.target.value})} style={{ width: '40px', height: '40px', padding: 0, border: 'none' }} />
+                      <input type="text" value={settingsForm.primaryColor || '#2d6a4f'} onChange={e => setSettingsForm({...settingsForm, primaryColor: e.target.value})} style={{ flex: 1 }} />
+                    </div>
+                  </div>
+                  <div className="form-group">
+                    <label>Gold Accent Color</label>
+                    <div style={{ display: 'flex', gap: '0.5rem' }}>
+                      <input type="color" value={settingsForm.secondaryColor || '#b5941f'} onChange={e => setSettingsForm({...settingsForm, secondaryColor: e.target.value})} style={{ width: '40px', height: '40px', padding: 0, border: 'none' }} />
+                      <input type="text" value={settingsForm.secondaryColor || '#b5941f'} onChange={e => setSettingsForm({...settingsForm, secondaryColor: e.target.value})} style={{ flex: 1 }} />
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div className="admin-section-box">
+                <h3 className="section-title">Shipping & Logic</h3>
+                <div className="form-grid">
+                  <div className="form-group">
+                    <label>Free Shipping Threshold (PKR)</label>
+                    <input type="number" value={settingsForm.freeShippingThreshold || '5000'} onChange={e => setSettingsForm({...settingsForm, freeShippingThreshold: e.target.value})} />
+                  </div>
+                  <div className="form-group">
+                    <label>Standard Shipping Fee (PKR)</label>
+                    <input type="number" value={settingsForm.shippingFee || '250'} onChange={e => setSettingsForm({...settingsForm, shippingFee: e.target.value})} />
+                  </div>
+                </div>
+              </div>
+
+              <div style={{ display: 'flex', justifyContent: 'flex-end', marginTop: '2rem' }}>
+                <button type="submit" className="btn-admin primary" style={{ padding: '0.8rem 2.5rem' }}>Save System Settings</button>
+              </div>
             </form>
           </div>
         )}
@@ -728,52 +922,187 @@ function Admin() {
                       required
                     />
                   </div>
+                  
+                  <div className="form-group">
+                    <label>SKU</label>
+                    <input
+                      type="text"
+                      value={formData.sku}
+                      onChange={(e) => setFormData({ ...formData, sku: e.target.value })}
+                      placeholder="Auto-generated if blank"
+                    />
+                  </div>
+
                   <div className="form-group">
                     <label>Category</label>
                     <select value={formData.category} onChange={(e) => setFormData({ ...formData, category: e.target.value })}>
                       <option value="Bedsheets">Bedsheets</option>
                       <option value="Curtains">Curtains</option>
+                      <option value="Pillow Covers">Pillow Covers</option>
+                      <option value="Comforters">Comforters</option>
+                      <option value="Bundles">Bundles</option>
                     </select>
                   </div>
+
                   <div className="form-group">
-                    <label>Condition</label>
-                    <select value={formData.condition} onChange={(e) => setFormData({ ...formData, condition: e.target.value })}>
-                      <option value="New">New</option>
-                      <option value="Pre-loved">Pre-loved</option>
-                    </select>
-                  </div>
-                  <div className="form-group">
-                    <label>Price ($)</label>
+                    <label>Price (PKR)</label>
                     <input
                       type="number"
-                      step="0.01"
                       min="0"
                       value={formData.price}
                       onChange={(e) => setFormData({ ...formData, price: e.target.value })}
-                      placeholder="0.00"
+                      placeholder="0"
                       required
                     />
                   </div>
+
                   <div className="form-group">
-                    <label>Product Image</label>
+                    <label>Sale Price (PKR)</label>
+                    <input
+                      type="number"
+                      min="0"
+                      value={formData.salePrice}
+                      onChange={(e) => setFormData({ ...formData, salePrice: e.target.value })}
+                      placeholder="Optional"
+                    />
+                  </div>
+
+                  <div className="form-group">
+                    <label>Stock Quantity</label>
+                    <input
+                      type="number"
+                      min="0"
+                      value={formData.stockQuantity}
+                      onChange={(e) => setFormData({ ...formData, stockQuantity: e.target.value })}
+                      required
+                    />
+                  </div>
+
+                  <div className="form-group">
+                    <label>Badge</label>
+                    <select value={formData.badge} onChange={(e) => setFormData({ ...formData, badge: e.target.value })}>
+                      <option value="None">None</option>
+                      <option value="New Arrival">New Arrival</option>
+                      <option value="Best Seller">Best Seller</option>
+                      <option value="Sale">Sale</option>
+                      <option value="Limited Edition">Limited Edition</option>
+                    </select>
+                  </div>
+
+                  <div className="form-group full-width">
+                    <label>Material</label>
+                    <input
+                      type="text"
+                      value={formData.material}
+                      onChange={(e) => setFormData({ ...formData, material: e.target.value })}
+                      placeholder="e.g. Cotton, Silk, Linen"
+                    />
+                  </div>
+
+                  <div className="form-group full-width">
+                    <label>Available Sizes</label>
+                    <div className="size-checkboxes" style={{ display: 'flex', gap: '1rem', flexWrap: 'wrap', marginTop: '0.5rem' }}>
+                      {['Single', 'Double', 'King', 'Queen', 'Custom'].map(size => (
+                        <label key={size} style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', cursor: 'pointer' }}>
+                          <input
+                            type="checkbox"
+                            checked={formData.sizes.includes(size)}
+                            onChange={() => toggleSize(size)}
+                          />
+                          {size}
+                        </label>
+                      ))}
+                    </div>
+                  </div>
+
+                  <div className="form-group full-width">
+                    <label>Available Colors (Press Enter to add)</label>
+                    <input
+                      type="text"
+                      placeholder="Type a color and press Enter"
+                      onKeyDown={addColor}
+                    />
+                    <div className="color-tags" style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap', marginTop: '0.75rem' }}>
+                      {formData.colors.map(color => (
+                        <span key={color} className="admin-badge gold" style={{ display: 'flex', alignItems: 'center', gap: '0.4rem', padding: '0.3rem 0.6rem' }}>
+                          {color}
+                          <X size={12} onClick={() => removeColor(color)} style={{ cursor: 'pointer' }} />
+                        </span>
+                      ))}
+                    </div>
+                  </div>
+
+                  <div className="form-group">
+                    <label>Main Image</label>
                     <input
                       type="file"
                       accept="image/*"
-                      onChange={handleImageUpload}
+                      onChange={(e) => handleImageUpload(e, false)}
                     />
+                    {formData.image && (
+                      <div style={{ marginTop: '0.75rem', position: 'relative', width: 'fit-content' }}>
+                        <img src={formData.image} alt="Main" style={{ width: '100px', height: '100px', objectFit: 'cover', borderRadius: '0.5rem', border: '1px solid #21262d' }} />
+                        <button type="button" onClick={() => setFormData({...formData, image: ''})} className="btn-icon danger" style={{ position: 'absolute', top: '-8px', right: '-8px', background: '#ef4444', color: '#fff', width: '20px', height: '20px' }}>
+                          <X size={12} />
+                        </button>
+                      </div>
+                    )}
                   </div>
-                  {formData.image && (
-                    <div className="form-group full-width">
-                      <label>Preview</label>
-                      <img src={formData.image} alt="Preview" className="image-preview" onError={(e) => e.target.style.display='none'} />
+
+                  <div className="form-group">
+                    <label>Gallery Images</label>
+                    <input
+                      type="file"
+                      accept="image/*"
+                      multiple
+                      onChange={(e) => handleImageUpload(e, true)}
+                    />
+                    <div style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap', marginTop: '0.75rem' }}>
+                      {formData.images.map((img, index) => (
+                        <div key={index} style={{ position: 'relative' }}>
+                          <img src={img} alt={`Gallery ${index}`} style={{ width: '60px', height: '60px', objectFit: 'cover', borderRadius: '0.5rem', border: '1px solid #21262d' }} />
+                          <button type="button" onClick={() => removeGalleryImage(index)} className="btn-icon danger" style={{ position: 'absolute', top: '-8px', right: '-8px', background: '#ef4444', color: '#fff', width: '18px', height: '18px' }}>
+                            <X size={10} />
+                          </button>
+                        </div>
+                      ))}
                     </div>
-                  )}
+                  </div>
+
+                  <div className="form-group full-width">
+                    <div style={{ display: 'flex', gap: '2rem' }}>
+                      <label className="toggle-row" style={{ cursor: 'pointer' }}>
+                        <div className="toggle-switch">
+                          <input 
+                            type="checkbox" 
+                            checked={formData.isFeatured} 
+                            onChange={e => setFormData({...formData, isFeatured: e.target.checked})} 
+                          />
+                          <span className="toggle-slider"></span>
+                        </div>
+                        <span>Is Featured?</span>
+                      </label>
+                      <label className="toggle-row" style={{ cursor: 'pointer' }}>
+                        <div className="toggle-switch">
+                          <input 
+                            type="checkbox" 
+                            checked={formData.isActive} 
+                            onChange={e => setFormData({...formData, isActive: e.target.checked})} 
+                          />
+                          <span className="toggle-slider"></span>
+                        </div>
+                        <span>Is Active/Published?</span>
+                      </label>
+                    </div>
+                  </div>
+
                   <div className="form-group full-width">
                     <label>Description</label>
                     <textarea
                       value={formData.description}
                       onChange={(e) => setFormData({ ...formData, description: e.target.value })}
-                      placeholder="A brief description of the product..."
+                      placeholder="Full product description and care instructions..."
+                      rows={5}
                     />
                   </div>
                 </div>
