@@ -470,6 +470,39 @@ function Admin() {
                 <input type="file" accept="image/*" onChange={(e) => handleSettingsImageUpload(e, 'categoryImage2')} />
                 {settingsForm.categoryImage2 && <img src={settingsForm.categoryImage2} alt="Category 2 Preview" className="image-preview" />}
               </div>
+
+              <h2 style={{ marginTop: '2rem' }}>Theme & Colors</h2>
+              <div className="form-grid">
+                <div className="form-group">
+                  <label>Primary Color (Buttons & Accents)</label>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
+                    <input type="color" value={settingsForm.primaryColor || '#8b7355'} onChange={e => setSettingsForm({...settingsForm, primaryColor: e.target.value})} style={{ width: '48px', height: '48px', border: 'none', background: 'none', cursor: 'pointer', padding: 0 }} />
+                    <input type="text" value={settingsForm.primaryColor || '#8b7355'} onChange={e => setSettingsForm({...settingsForm, primaryColor: e.target.value})} style={{ flex: 1 }} />
+                  </div>
+                </div>
+                <div className="form-group">
+                  <label>Secondary Color (Badges & Tags)</label>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
+                    <input type="color" value={settingsForm.secondaryColor || '#8f9779'} onChange={e => setSettingsForm({...settingsForm, secondaryColor: e.target.value})} style={{ width: '48px', height: '48px', border: 'none', background: 'none', cursor: 'pointer', padding: 0 }} />
+                    <input type="text" value={settingsForm.secondaryColor || '#8f9779'} onChange={e => setSettingsForm({...settingsForm, secondaryColor: e.target.value})} style={{ flex: 1 }} />
+                  </div>
+                </div>
+                <div className="form-group">
+                  <label>Background Color</label>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
+                    <input type="color" value={settingsForm.backgroundColor || '#faf9f6'} onChange={e => setSettingsForm({...settingsForm, backgroundColor: e.target.value})} style={{ width: '48px', height: '48px', border: 'none', background: 'none', cursor: 'pointer', padding: 0 }} />
+                    <input type="text" value={settingsForm.backgroundColor || '#faf9f6'} onChange={e => setSettingsForm({...settingsForm, backgroundColor: e.target.value})} style={{ flex: 1 }} />
+                  </div>
+                </div>
+                <div className="form-group">
+                  <label>Text Color</label>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
+                    <input type="color" value={settingsForm.textColor || '#2c302e'} onChange={e => setSettingsForm({...settingsForm, textColor: e.target.value})} style={{ width: '48px', height: '48px', border: 'none', background: 'none', cursor: 'pointer', padding: 0 }} />
+                    <input type="text" value={settingsForm.textColor || '#2c302e'} onChange={e => setSettingsForm({...settingsForm, textColor: e.target.value})} style={{ flex: 1 }} />
+                  </div>
+                </div>
+              </div>
+
               <button type="submit" className="btn btn-primary">Save Content</button>
             </form>
           </div>

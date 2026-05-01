@@ -2,10 +2,15 @@ import { X, Minus, Plus, ShoppingBag } from 'lucide-react';
 import { useCart } from '../CartContext';
 import './CartDrawer.css';
 
-function CartDrawer() {
+function CartDrawer({ onCheckout }) {
   const { isCartOpen, setIsCartOpen, cartItems, updateQuantity, removeFromCart, cartTotal } = useCart();
 
   if (!isCartOpen) return null;
+
+  const handleCheckout = () => {
+    setIsCartOpen(false);
+    if (onCheckout) onCheckout();
+  };
 
   return (
     <>
@@ -57,7 +62,7 @@ function CartDrawer() {
               <span className="cart-total-price">${cartTotal.toFixed(2)}</span>
             </div>
             <p className="cart-taxes-note">Taxes and shipping calculated at checkout</p>
-            <button className="btn btn-primary checkout-btn" onClick={() => alert('Checkout flow goes here!')}>
+            <button className="btn btn-primary checkout-btn" onClick={handleCheckout}>
               Check out
             </button>
           </div>
