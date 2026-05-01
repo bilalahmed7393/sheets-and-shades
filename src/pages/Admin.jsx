@@ -1,10 +1,11 @@
 import { useState, useEffect, useRef } from 'react';
 import {
   Lock, LogOut, Plus, Pencil, Trash2, Search,
-  Download, Upload, RotateCcw, X, Package,
-  ShoppingBag, Layers, Heart, CheckCircle, AlertCircle, Settings as SettingsIcon
+  X, Package, ShoppingBag, Layers, Heart,
+  CheckCircle, AlertCircle, Settings as SettingsIcon,
+  ClipboardList, ChevronDown, Eye
 } from 'lucide-react';
-import { getProducts, addProduct, updateProduct, deleteProduct, getNextId, exportProducts, importProducts, resetProducts, defaultProducts, updateSettings } from '../data';
+import { getProducts, addProduct, updateProduct, deleteProduct, getNextId, updateSettings, getOrders, updateOrderStatus, deleteOrder as deleteOrderApi } from '../data';
 import { useSiteSettings } from '../SiteContext';
 import './Admin.css';
 
@@ -20,7 +21,8 @@ function Admin() {
   const [editingProduct, setEditingProduct] = useState(null);
   const [deleteConfirm, setDeleteConfirm] = useState(null);
   const [toast, setToast] = useState(null);
-  const fileInputRef = useRef(null);
+  const [orders, setOrders] = useState([]);
+  const [selectedOrder, setSelectedOrder] = useState(null);
 
   const [activeTab, setActiveTab] = useState('products');
   const { settings, updateLocalSettings } = useSiteSettings();
@@ -38,6 +40,7 @@ function Admin() {
   useEffect(() => {
     if (isLoggedIn) {
       getProducts().then(setProducts);
+      getOrders().then(setOrders).catch(() => {});
     }
   }, [isLoggedIn]);
 
@@ -218,25 +221,23 @@ function Admin() {
     }
   };
 
-  // Import / Export / Reset
-  const handleImport = async (e) => {
-    const file = e.target.files[0];
-    if (!file) return;
+  // Order management
+  const handleUpdateOrderStatus = async (orderId, newStatus) => {
     try {
-      const imported = await importProducts(file);
-      setProducts(imported);
-      showToast(`Imported ${imported.length} products`);
+      const updated = await updateOrderStatus(orderId, newStatus);
+      setOrders(orders.map(o => o._id === orderId ? updated : o));
+      showToast(`Order updated to ${newStatus}`);
     } catch (err) {
       showToast(err.message, 'error');
     }
-    e.target.value = '';
   };
 
-  const handleReset = async () => {
+  const handleDeleteOrder = async (orderId) => {
     try {
-      await resetProducts();
-      setProducts([...defaultProducts]);
-      showToast('Catalog reset to defaults');
+      await deleteOrderApi(orderId);
+      setOrders(orders.filter(o => o._id !== orderId));
+      setSelectedOrder(null);
+      showToast('Order deleted');
     } catch (err) {
       showToast(err.message, 'error');
     }
@@ -262,7 +263,7 @@ function Admin() {
     return (
       <div className="admin-layout admin-login">
         <div className="login-card">
-          <div className="brand-text">Sheets <span>&</span> Shades</div>
+          <div className="brand-text">{settings.siteName}</div>
           <h1>Admin Portal</h1>
           <p className="login-subtitle">Enter your password to manage products</p>
           <form className="login-form" onSubmit={handleLogin}>
@@ -291,20 +292,10 @@ function Admin() {
       {/* Header */}
       <header className="admin-header">
         <div className="admin-header-left">
-          <div className="admin-brand">Sheets <span>&</span> Shades</div>
+          <div className="admin-brand">{settings.siteName}</div>
           <span className="admin-badge">Admin</span>
         </div>
         <div className="admin-header-right">
-          <button className="admin-icon-btn" onClick={exportProducts}>
-            <Download size={16} /> Export
-          </button>
-          <button className="admin-icon-btn" onClick={() => fileInputRef.current?.click()}>
-            <Upload size={16} /> Import
-          </button>
-          <input ref={fileInputRef} type="file" accept=".json" className="hidden-input" onChange={handleImport} />
-          <button className="admin-icon-btn" onClick={handleReset}>
-            <RotateCcw size={16} /> Reset
-          </button>
           <button className="admin-icon-btn danger" onClick={handleLogout}>
             <LogOut size={16} /> Logout
           </button>
@@ -314,6 +305,9 @@ function Admin() {
       <div className="admin-tabs">
         <button className={`tab-btn ${activeTab === 'products' ? 'active' : ''}`} onClick={() => setActiveTab('products')}>
           <Package size={16} /> Products
+        </button>
+        <button className={`tab-btn ${activeTab === 'orders' ? 'active' : ''}`} onClick={() => setActiveTab('orders')}>
+          <ClipboardList size={16} /> Orders {orders.length > 0 && <span className="admin-badge" style={{ marginLeft: '0.25rem', fontSize: '0.65rem', padding: '0.15rem 0.5rem' }}>{orders.length}</span>}
         </button>
         <button className={`tab-btn ${activeTab === 'settings' ? 'active' : ''}`} onClick={() => setActiveTab('settings')}>
           <SettingsIcon size={16} /> Website Content
@@ -429,6 +423,128 @@ function Admin() {
             <p>{searchTerm ? 'Try a different search term.' : 'Click "Add Product" to get started.'}</p>
           </div>
         )}
+          </>
+        ) : activeTab === 'orders' ? (
+          <>
+            {/* Orders Tab */}
+            {selectedOrder ? (
+              <div className="settings-panel">
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.5rem' }}>
+                  <h2>Order #{selectedOrder.orderNumber}</h2>
+                  <button className="admin-icon-btn" onClick={() => setSelectedOrder(null)}>← Back</button>
+                </div>
+                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem', marginBottom: '1.5rem' }}>
+                  <div className="form-group">
+                    <label>Customer Name</label>
+                    <p style={{ color: '#e4e6ea' }}>{selectedOrder.customerName}</p>
+                  </div>
+                  <div className="form-group">
+                    <label>Email</label>
+                    <p style={{ color: '#e4e6ea' }}>{selectedOrder.customerEmail}</p>
+                  </div>
+                  <div className="form-group">
+                    <label>Phone</label>
+                    <p style={{ color: '#e4e6ea' }}>{selectedOrder.customerPhone}</p>
+                  </div>
+                  <div className="form-group">
+                    <label>Status</label>
+                    <select
+                      value={selectedOrder.status}
+                      onChange={(e) => handleUpdateOrderStatus(selectedOrder._id, e.target.value)}
+                      style={{ padding: '0.5rem', background: '#1a1d23', border: '1px solid #33363e', borderRadius: '0.5rem', color: '#e4e6ea', fontFamily: 'inherit' }}
+                    >
+                      <option value="Pending">Pending</option>
+                      <option value="Processing">Processing</option>
+                      <option value="Shipped">Shipped</option>
+                      <option value="Delivered">Delivered</option>
+                      <option value="Cancelled">Cancelled</option>
+                    </select>
+                  </div>
+                  <div className="form-group" style={{ gridColumn: '1 / -1' }}>
+                    <label>Shipping Address</label>
+                    <p style={{ color: '#e4e6ea' }}>{selectedOrder.shippingAddress}, {selectedOrder.shippingCity} {selectedOrder.shippingZip}</p>
+                  </div>
+                </div>
+                <label style={{ fontSize: '0.8rem', fontWeight: 600, color: '#8b8e96', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Items</label>
+                <div className="product-table-container" style={{ marginTop: '0.5rem' }}>
+                  <table className="product-table">
+                    <thead><tr><th>Product</th><th>Qty</th><th>Price</th><th>Subtotal</th></tr></thead>
+                    <tbody>
+                      {selectedOrder.items.map((item, i) => (
+                        <tr key={i}>
+                          <td>
+                            <div className="table-product-info">
+                              <img src={item.image} alt={item.name} className="table-product-thumb" />
+                              <div className="table-product-name">{item.name}</div>
+                            </div>
+                          </td>
+                          <td>{item.quantity}</td>
+                          <td className="table-price">${item.price.toFixed(2)}</td>
+                          <td className="table-price">${(item.price * item.quantity).toFixed(2)}</td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: '1.5rem', paddingTop: '1rem', borderTop: '1px solid #2d3039' }}>
+                  <span style={{ fontSize: '1.2rem', fontWeight: 700, color: '#c9a96e' }}>Total: ${selectedOrder.total.toFixed(2)}</span>
+                  <button className="admin-icon-btn danger" onClick={() => handleDeleteOrder(selectedOrder._id)}>
+                    <Trash2 size={16} /> Delete Order
+                  </button>
+                </div>
+              </div>
+            ) : orders.length > 0 ? (
+              <div className="product-table-container">
+                <table className="product-table">
+                  <thead>
+                    <tr>
+                      <th>Order #</th>
+                      <th>Customer</th>
+                      <th>Items</th>
+                      <th>Total</th>
+                      <th>Status</th>
+                      <th>Date</th>
+                      <th>Actions</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {orders.map(order => (
+                      <tr key={order._id}>
+                        <td style={{ fontWeight: 600, color: '#c9a96e', fontSize: '0.85rem' }}>{order.orderNumber}</td>
+                        <td>
+                          <div className="table-product-name">{order.customerName}</div>
+                          <div className="table-product-desc">{order.customerEmail}</div>
+                        </td>
+                        <td>{order.items.reduce((sum, item) => sum + item.quantity, 0)} items</td>
+                        <td className="table-price">${order.total.toFixed(2)}</td>
+                        <td>
+                          <span className={`table-badge ${order.status === 'Pending' ? 'preloved' : order.status === 'Delivered' ? 'new' : order.status === 'Cancelled' ? '' : 'bedsheets'}`}>
+                            {order.status}
+                          </span>
+                        </td>
+                        <td style={{ fontSize: '0.85rem', color: '#8b8e96' }}>{new Date(order.createdAt).toLocaleDateString()}</td>
+                        <td>
+                          <div className="table-actions">
+                            <button className="table-action-btn" onClick={() => setSelectedOrder(order)} title="View">
+                              <Eye size={15} />
+                            </button>
+                            <button className="table-action-btn delete" onClick={() => handleDeleteOrder(order._id)} title="Delete">
+                              <Trash2 size={15} />
+                            </button>
+                          </div>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            ) : (
+              <div className="admin-empty">
+                <ClipboardList size={48} />
+                <h3>No orders yet</h3>
+                <p>Orders will appear here when customers place them through your store.</p>
+              </div>
+            )}
           </>
         ) : (
           <div className="settings-panel">

@@ -205,3 +205,48 @@ export async function updateSettings(settings) {
   if (!res.ok) throw new Error('Failed to update settings');
   return res.json();
 }
+
+/**
+ * Create a new order.
+ */
+export async function createOrder(orderData) {
+  const res = await fetch('/api/orders', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(orderData)
+  });
+  if (!res.ok) throw new Error('Failed to place order');
+  return res.json();
+}
+
+/**
+ * Fetch all orders.
+ */
+export async function getOrders() {
+  const res = await fetch('/api/orders');
+  if (!res.ok) throw new Error('Failed to fetch orders');
+  return res.json();
+}
+
+/**
+ * Update an order's status.
+ */
+export async function updateOrderStatus(id, status) {
+  const res = await fetch(`/api/orders/${id}`, {
+    method: 'PUT',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ status })
+  });
+  if (!res.ok) throw new Error('Failed to update order');
+  return res.json();
+}
+
+/**
+ * Delete an order.
+ */
+export async function deleteOrder(id) {
+  const res = await fetch(`/api/orders/${id}`, { method: 'DELETE' });
+  if (!res.ok) throw new Error('Failed to delete order');
+  return res.json();
+}
+

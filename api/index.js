@@ -48,6 +48,29 @@ const settingsSchema = new mongoose.Schema({
 
 const Settings = mongoose.models.Settings || mongoose.model('Settings', settingsSchema);
 
+// Order Schema
+const orderSchema = new mongoose.Schema({
+  orderNumber: { type: String, required: true, unique: true },
+  customerName: { type: String, required: true },
+  customerEmail: { type: String, required: true },
+  customerPhone: { type: String, required: true },
+  shippingAddress: { type: String, required: true },
+  shippingCity: { type: String, required: true },
+  shippingZip: { type: String, required: true },
+  items: [{
+    productId: Number,
+    name: String,
+    price: Number,
+    quantity: Number,
+    image: String
+  }],
+  total: { type: Number, required: true },
+  status: { type: String, default: 'Pending', enum: ['Pending', 'Processing', 'Shipped', 'Delivered', 'Cancelled'] },
+  createdAt: { type: Date, default: Date.now }
+});
+
+const Order = mongoose.models.Order || mongoose.model('Order', orderSchema);
+
 // GET all products
 app.get('/api/products', async (req, res) => {
   try {
@@ -134,6 +157,56 @@ app.put('/api/settings', async (req, res) => {
   }
 });
 
+// ---- Orders ----
+
+// GET all orders
+app.get('/api/orders', async (req, res) => {
+  try {
+    const orders = await Order.find().sort({ createdAt: -1 });
+    res.json(orders);
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+});
+
+// POST create a new order
+app.post('/api/orders', async (req, res) => {
+  try {
+    const orderNumber = 'ORD-' + Date.now().toString(36).toUpperCase() + '-' + Math.random().toString(36).substring(2, 6).toUpperCase();
+    const order = new Order({ ...req.body, orderNumber });
+    const saved = await order.save();
+    res.status(201).json(saved);
+  } catch (error) {
+    res.status(400).json({ message: error.message });
+  }
+});
+
+// PUT update order status
+app.put('/api/orders/:id', async (req, res) => {
+  try {
+    const updated = await Order.findByIdAndUpdate(
+      req.params.id,
+      { status: req.body.status },
+      { new: true }
+    );
+    if (!updated) return res.status(404).json({ message: 'Order not found' });
+    res.json(updated);
+  } catch (error) {
+    res.status(400).json({ message: error.message });
+  }
+});
+
+// DELETE an order
+app.delete('/api/orders/:id', async (req, res) => {
+  try {
+    const deleted = await Order.findByIdAndDelete(req.params.id);
+    if (!deleted) return res.status(404).json({ message: 'Order not found' });
+    res.json({ message: 'Order deleted' });
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+});
+
 // Start the server (if not running in a serverless environment like Vercel)
 if (process.env.NODE_ENV !== 'production') {
   const PORT = process.env.PORT || 3000;
@@ -143,3 +216,4 @@ if (process.env.NODE_ENV !== 'production') {
 }
 
 export default app;
+
