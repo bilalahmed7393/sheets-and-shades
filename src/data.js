@@ -173,3 +173,35 @@ export async function resetProducts() {
     body: JSON.stringify(defaultProducts)
   });
 }
+
+/**
+ * Fetch settings from the backend.
+ */
+export async function getSettings() {
+  try {
+    const res = await fetch('/api/settings');
+    if (!res.ok) throw new Error('Failed to fetch settings');
+    return await res.json();
+  } catch (e) {
+    console.error('API Fetch Error:', e);
+    return {
+      siteName: 'Sheets & Shades',
+      heroHeadline: 'Curated Comfort for Your Home',
+      heroSubtitle: 'Discover our premium collection of pre-loved and new bedsheets and curtains.',
+      aboutText: 'A marketplace for premium bedsheets and curtains.'
+    };
+  }
+}
+
+/**
+ * Update settings on the backend.
+ */
+export async function updateSettings(settings) {
+  const res = await fetch('/api/settings', {
+    method: 'PUT',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(settings)
+  });
+  if (!res.ok) throw new Error('Failed to update settings');
+  return res.json();
+}

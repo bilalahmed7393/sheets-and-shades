@@ -29,6 +29,17 @@ const productSchema = new mongoose.Schema({
 
 const Product = mongoose.models.Product || mongoose.model('Product', productSchema);
 
+// Settings Schema
+const settingsSchema = new mongoose.Schema({
+  id: { type: String, default: 'global' },
+  siteName: { type: String, default: 'Sheets & Shades' },
+  heroHeadline: { type: String, default: 'Curated Comfort for Your Home' },
+  heroSubtitle: { type: String, default: 'Discover our premium collection of pre-loved and new bedsheets and curtains.' },
+  aboutText: { type: String, default: 'A marketplace for premium bedsheets and curtains.' }
+});
+
+const Settings = mongoose.models.Settings || mongoose.model('Settings', settingsSchema);
+
 // GET all products
 app.get('/api/products', async (req, res) => {
   try {
@@ -83,6 +94,33 @@ app.post('/api/products/batch', async (req, res) => {
     await Product.deleteMany({}); // Optional: clear existing
     const saved = await Product.insertMany(products);
     res.status(201).json(saved);
+  } catch (error) {
+    res.status(400).json({ message: error.message });
+  }
+});
+
+// GET Settings
+app.get('/api/settings', async (req, res) => {
+  try {
+    let settings = await Settings.findOne({ id: 'global' });
+    if (!settings) {
+      settings = await Settings.create({ id: 'global' });
+    }
+    res.json(settings);
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+});
+
+// PUT Settings
+app.put('/api/settings', async (req, res) => {
+  try {
+    const updated = await Settings.findOneAndUpdate(
+      { id: 'global' },
+      req.body,
+      { new: true, upsert: true, runValidators: true }
+    );
+    res.json(updated);
   } catch (error) {
     res.status(400).json({ message: error.message });
   }

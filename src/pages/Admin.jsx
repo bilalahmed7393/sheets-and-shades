@@ -2,9 +2,10 @@ import { useState, useEffect, useRef } from 'react';
 import {
   Lock, LogOut, Plus, Pencil, Trash2, Search,
   Download, Upload, RotateCcw, X, Package,
-  ShoppingBag, Layers, Heart, CheckCircle, AlertCircle
+  ShoppingBag, Layers, Heart, CheckCircle, AlertCircle, Settings as SettingsIcon
 } from 'lucide-react';
-import { getProducts, addProduct, updateProduct, deleteProduct, getNextId, exportProducts, importProducts, resetProducts, defaultProducts } from '../data';
+import { getProducts, addProduct, updateProduct, deleteProduct, getNextId, exportProducts, importProducts, resetProducts, defaultProducts, updateSettings } from '../data';
+import { useSiteSettings } from '../SiteContext';
 import './Admin.css';
 
 const ADMIN_PASSWORD = 'admin123';
@@ -20,6 +21,14 @@ function Admin() {
   const [deleteConfirm, setDeleteConfirm] = useState(null);
   const [toast, setToast] = useState(null);
   const fileInputRef = useRef(null);
+
+  const [activeTab, setActiveTab] = useState('products');
+  const { settings, updateLocalSettings } = useSiteSettings();
+  const [settingsForm, setSettingsForm] = useState(settings);
+
+  useEffect(() => {
+    setSettingsForm(settings);
+  }, [settings]);
 
   const [formData, setFormData] = useState({
     name: '', category: 'Bedsheets', condition: 'New',
@@ -54,6 +63,17 @@ function Admin() {
     sessionStorage.removeItem('admin_auth');
     setIsLoggedIn(false);
     setPassword('');
+  };
+
+  const handleSettingsSave = async (e) => {
+    e.preventDefault();
+    try {
+      const saved = await updateSettings(settingsForm);
+      updateLocalSettings(saved);
+      showToast('Settings saved successfully');
+    } catch (err) {
+      showToast(err.message, 'error');
+    }
   };
 
   // Modal helpers
@@ -252,8 +272,19 @@ function Admin() {
         </div>
       </header>
 
+      <div className="admin-tabs">
+        <button className={`tab-btn ${activeTab === 'products' ? 'active' : ''}`} onClick={() => setActiveTab('products')}>
+          <Package size={16} /> Products
+        </button>
+        <button className={`tab-btn ${activeTab === 'settings' ? 'active' : ''}`} onClick={() => setActiveTab('settings')}>
+          <SettingsIcon size={16} /> Website Content
+        </button>
+      </div>
+
       <div className="admin-main">
-        {/* Stats */}
+        {activeTab === 'products' ? (
+          <>
+            {/* Stats */}
         <div className="admin-stats">
           <div className="stat-card">
             <div className="stat-icon total"><Package size={22} /></div>
@@ -357,6 +388,31 @@ function Admin() {
             <Package size={48} />
             <h3>No products found</h3>
             <p>{searchTerm ? 'Try a different search term.' : 'Click "Add Product" to get started.'}</p>
+          </div>
+        )}
+          </>
+        ) : (
+          <div className="settings-panel">
+            <h2>Edit Website Content</h2>
+            <form onSubmit={handleSettingsSave} className="settings-form">
+              <div className="form-group">
+                <label>Website Name</label>
+                <input type="text" value={settingsForm.siteName} onChange={e => setSettingsForm({...settingsForm, siteName: e.target.value})} required />
+              </div>
+              <div className="form-group">
+                <label>Hero Headline</label>
+                <input type="text" value={settingsForm.heroHeadline} onChange={e => setSettingsForm({...settingsForm, heroHeadline: e.target.value})} required />
+              </div>
+              <div className="form-group">
+                <label>Hero Subtitle</label>
+                <textarea value={settingsForm.heroSubtitle} onChange={e => setSettingsForm({...settingsForm, heroSubtitle: e.target.value})} required />
+              </div>
+              <div className="form-group">
+                <label>About Us / Footer Text</label>
+                <textarea value={settingsForm.aboutText} onChange={e => setSettingsForm({...settingsForm, aboutText: e.target.value})} required />
+              </div>
+              <button type="submit" className="btn btn-primary">Save Content</button>
+            </form>
           </div>
         )}
       </div>

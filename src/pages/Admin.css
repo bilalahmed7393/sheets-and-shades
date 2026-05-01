@@ -812,3 +812,68 @@
     margin: 1rem;
   }
 }
+
+/* ---- CMS Tabs ---- */
+.admin-tabs {
+  display: flex;
+  gap: 1rem;
+  padding: 0 2rem;
+  background: #22252d;
+  border-bottom: 1px solid #2d3039;
+}
+
+.tab-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 1rem 0;
+  background: transparent;
+  border: none;
+  border-bottom: 2px solid transparent;
+  color: #8b8e96;
+  font-size: 0.95rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.tab-btn:hover {
+  color: #e4e6ea;
+}
+
+.tab-btn.active {
+  color: #8b7355;
+  border-bottom-color: #8b7355;
+}
+
+/* ---- Settings Panel ---- */
+.settings-panel {
+  background: #22252d;
+  border: 1px solid #2d3039;
+  border-radius: 0.75rem;
+  padding: 2rem;
+  max-width: 800px;
+}
+
+.settings-panel h2 {
+  font-size: 1.25rem;
+  color: #fff;
+  margin-bottom: 1.5rem;
+}
+
+.settings-form {
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+}
+
+.settings-form .form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.settings-form input,
+.settings-form textarea {
+  width: 100%;
+}

@@ -3,9 +3,11 @@ import { useState, useEffect } from 'react';
 import { ArrowRight } from 'lucide-react';
 import ProductCard from '../components/ProductCard';
 import { getProducts } from '../data';
+import { useSiteSettings } from '../SiteContext';
 import './Home.css';
 
 function Home() {
+  const { settings } = useSiteSettings();
   const [products, setProducts] = useState([]);
 
   useEffect(() => {
@@ -28,8 +30,8 @@ function Home() {
         </div>
         <div className="container hero-content">
           <div className="hero-text glass-panel">
-            <h1>Sleep in Style. <br/>Live in Comfort.</h1>
-            <p>Discover our premium collection of new and pre-loved bedsheets and curtains to elevate your home.</p>
+            <h1>{settings.heroHeadline}</h1>
+            <p>{settings.heroSubtitle}</p>
             <div className="hero-actions">
               <Link to="/shop" className="btn btn-primary">
                 Shop Collection <ArrowRight size={18} className="ml-2" />

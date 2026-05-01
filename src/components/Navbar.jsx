@@ -1,13 +1,15 @@
 import { Link } from 'react-router-dom';
 import { ShoppingBag, Menu } from 'lucide-react';
+import { useSiteSettings } from '../SiteContext';
 import './Navbar.css';
 
 function Navbar() {
+  const { settings } = useSiteSettings();
   return (
     <header className="navbar glass-panel">
       <div className="container navbar-content">
         <Link to="/" className="brand">
-          Sheets <span className="ampersand">&</span> Shades
+          {settings.siteName}
         </Link>
         <nav className="nav-links">
           <Link to="/">Home</Link>

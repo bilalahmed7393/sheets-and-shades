@@ -1,12 +1,14 @@
+import { useSiteSettings } from '../SiteContext';
 import './Footer.css';
 
 function Footer() {
+  const { settings } = useSiteSettings();
   return (
     <footer className="footer">
       <div className="container footer-content">
         <div className="footer-brand">
-          <h3>Sheets <span>&</span> Shades</h3>
-          <p className="text-muted">Premium quality bedsheets and curtains for every home. Discover our curated collection of new and pre-loved home decor.</p>
+          <h3>{settings.siteName}</h3>
+          <p className="text-muted">{settings.aboutText}</p>
         </div>
         <div className="footer-links">
           <h4>Shop</h4>
@@ -27,7 +29,7 @@ function Footer() {
         </div>
       </div>
       <div className="container footer-bottom">
-        <p className="text-muted">&copy; {new Date().getFullYear()} Sheets & Shades. All rights reserved.</p>
+        <p className="text-muted">&copy; {new Date().getFullYear()} {settings.siteName}. All rights reserved.</p>
       </div>
     </footer>
   );
