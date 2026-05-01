@@ -31,6 +31,7 @@ function Admin() {
   const [activeTab, setActiveTab] = useState('dashboard');
   const { settings, updateLocalSettings } = useSiteSettings();
   const [settingsForm, setSettingsForm] = useState(settings);
+  const [showAdminPass, setShowAdminPass] = useState(false);
 
   useEffect(() => {
     setSettingsForm(settings);
@@ -756,7 +757,7 @@ function Admin() {
             <form onSubmit={handleSettingsSave} className="settings-form">
               
               <div className="admin-section-box">
-                <h3 className="section-title">Announcement Bar</h3>
+                <h3 className="section-title">Announcement Bar Customization</h3>
                 <div className="form-group-v2">
                   <div className="toggle-row">
                     <div className="toggle-switch">
@@ -772,12 +773,30 @@ function Admin() {
                 </div>
                 <div className="form-group">
                   <label>Announcement Text</label>
-                  <input type="text" value={settingsForm.announcementText || ''} onChange={e => setSettingsForm({...settingsForm, announcementText: e.target.value})} placeholder="e.g. Free shipping on orders over PKR 5000!" />
+                  <input type="text" value={settingsForm.announcementText || ''} onChange={e => setSettingsForm({...settingsForm, announcementText: e.target.value})} />
+                </div>
+                <div className="form-grid">
+                  <div className="form-group">
+                    <label>Background Color</label>
+                    <input type="color" value={settingsForm.announcementBgColor || '#2d6a4f'} onChange={e => setSettingsForm({...settingsForm, announcementBgColor: e.target.value})} />
+                  </div>
+                  <div className="form-group">
+                    <label>Text Color</label>
+                    <input type="color" value={settingsForm.announcementTextColor || '#ffffff'} onChange={e => setSettingsForm({...settingsForm, announcementTextColor: e.target.value})} />
+                  </div>
+                  <div className="form-group">
+                    <label>Font Size (e.g. 14px)</label>
+                    <input type="text" value={settingsForm.announcementFontSize || '14px'} onChange={e => setSettingsForm({...settingsForm, announcementFontSize: e.target.value})} />
+                  </div>
+                  <div className="form-group">
+                    <label>Padding (e.g. 10px)</label>
+                    <input type="text" value={settingsForm.announcementPadding || '10px'} onChange={e => setSettingsForm({...settingsForm, announcementPadding: e.target.value})} />
+                  </div>
                 </div>
               </div>
 
               <div className="admin-section-box">
-                <h3 className="section-title">Navbar & Branding</h3>
+                <h3 className="section-title">Navbar & Branding Customization</h3>
                 <div className="form-grid">
                   <div className="form-group">
                     <label>Logo Image</label>
@@ -794,6 +813,18 @@ function Admin() {
                   <div className="form-group">
                     <label>Site Name</label>
                     <input type="text" value={settingsForm.siteName || ''} onChange={e => setSettingsForm({...settingsForm, siteName: e.target.value})} required />
+                  </div>
+                  <div className="form-group">
+                    <label>Navbar Background Color</label>
+                    <input type="text" value={settingsForm.navbarBgColor || 'rgba(255, 255, 255, 0.9)'} onChange={e => setSettingsForm({...settingsForm, navbarBgColor: e.target.value})} />
+                  </div>
+                  <div className="form-group">
+                    <label>Logo Height (e.g. 64px)</label>
+                    <input type="text" value={settingsForm.logoHeight || '64px'} onChange={e => setSettingsForm({...settingsForm, logoHeight: e.target.value})} />
+                  </div>
+                  <div className="form-group">
+                    <label>Navbar Height (e.g. 76px)</label>
+                    <input type="text" value={settingsForm.navbarHeight || '76px'} onChange={e => setSettingsForm({...settingsForm, navbarHeight: e.target.value})} />
                   </div>
                 </div>
                 <div className="form-group-v2" style={{ marginTop: '1rem' }}>
@@ -1002,6 +1033,97 @@ function Admin() {
               </div>
 
               <div className="admin-section-box">
+                <h3 className="section-title">Trust Bar Customization</h3>
+                <div className="form-group-v2">
+                  <div className="toggle-row">
+                    <div className="toggle-switch">
+                      <input 
+                        type="checkbox" 
+                        checked={settingsForm.showTrustBar !== false} 
+                        onChange={e => setSettingsForm({...settingsForm, showTrustBar: e.target.checked})} 
+                      />
+                      <span className="toggle-slider"></span>
+                    </div>
+                    <span>Show Trust Bar on Homepage?</span>
+                  </div>
+                </div>
+
+                <div className="form-grid" style={{ marginTop: '1.5rem' }}>
+                  <div className="trust-edit-card" style={{ border: '1px solid #21262d', padding: '1rem', borderRadius: '0.5rem' }}>
+                    <div className="toggle-row" style={{ marginBottom: '0.75rem' }}>
+                      <div className="toggle-switch">
+                        <input type="checkbox" checked={settingsForm.showTrustItem1 !== false} onChange={e => setSettingsForm({...settingsForm, showTrustItem1: e.target.checked})} />
+                        <span className="toggle-slider"></span>
+                      </div>
+                      <span style={{ fontSize: '0.8rem', fontWeight: 600 }}>Item 1 (Shipping)</span>
+                    </div>
+                    <div className="form-group">
+                      <label>Title</label>
+                      <input type="text" value={settingsForm.trustItem1Title || ''} onChange={e => setSettingsForm({...settingsForm, trustItem1Title: e.target.value})} />
+                    </div>
+                    <div className="form-group">
+                      <label>Description</label>
+                      <input type="text" value={settingsForm.trustItem1Desc || ''} onChange={e => setSettingsForm({...settingsForm, trustItem1Desc: e.target.value})} />
+                    </div>
+                  </div>
+
+                  <div className="trust-edit-card" style={{ border: '1px solid #21262d', padding: '1rem', borderRadius: '0.5rem' }}>
+                    <div className="toggle-row" style={{ marginBottom: '0.75rem' }}>
+                      <div className="toggle-switch">
+                        <input type="checkbox" checked={settingsForm.showTrustItem2 !== false} onChange={e => setSettingsForm({...settingsForm, showTrustItem2: e.target.checked})} />
+                        <span className="toggle-slider"></span>
+                      </div>
+                      <span style={{ fontSize: '0.8rem', fontWeight: 600 }}>Item 2 (Quality)</span>
+                    </div>
+                    <div className="form-group">
+                      <label>Title</label>
+                      <input type="text" value={settingsForm.trustItem2Title || ''} onChange={e => setSettingsForm({...settingsForm, trustItem2Title: e.target.value})} />
+                    </div>
+                    <div className="form-group">
+                      <label>Description</label>
+                      <input type="text" value={settingsForm.trustItem2Desc || ''} onChange={e => setSettingsForm({...settingsForm, trustItem2Desc: e.target.value})} />
+                    </div>
+                  </div>
+
+                  <div className="trust-edit-card" style={{ border: '1px solid #21262d', padding: '1rem', borderRadius: '0.5rem' }}>
+                    <div className="toggle-row" style={{ marginBottom: '0.75rem' }}>
+                      <div className="toggle-switch">
+                        <input type="checkbox" checked={settingsForm.showTrustItem3 !== false} onChange={e => setSettingsForm({...settingsForm, showTrustItem3: e.target.checked})} />
+                        <span className="toggle-slider"></span>
+                      </div>
+                      <span style={{ fontSize: '0.8rem', fontWeight: 600 }}>Item 3 (Returns)</span>
+                    </div>
+                    <div className="form-group">
+                      <label>Title</label>
+                      <input type="text" value={settingsForm.trustItem3Title || ''} onChange={e => setSettingsForm({...settingsForm, trustItem3Title: e.target.value})} />
+                    </div>
+                    <div className="form-group">
+                      <label>Description</label>
+                      <input type="text" value={settingsForm.trustItem3Desc || ''} onChange={e => setSettingsForm({...settingsForm, trustItem3Desc: e.target.value})} />
+                    </div>
+                  </div>
+
+                  <div className="trust-edit-card" style={{ border: '1px solid #21262d', padding: '1rem', borderRadius: '0.5rem' }}>
+                    <div className="toggle-row" style={{ marginBottom: '0.75rem' }}>
+                      <div className="toggle-switch">
+                        <input type="checkbox" checked={settingsForm.showTrustItem4 !== false} onChange={e => setSettingsForm({...settingsForm, showTrustItem4: e.target.checked})} />
+                        <span className="toggle-slider"></span>
+                      </div>
+                      <span style={{ fontSize: '0.8rem', fontWeight: 600 }}>Item 4 (Support)</span>
+                    </div>
+                    <div className="form-group">
+                      <label>Title</label>
+                      <input type="text" value={settingsForm.trustItem4Title || ''} onChange={e => setSettingsForm({...settingsForm, trustItem4Title: e.target.value})} />
+                    </div>
+                    <div className="form-group">
+                      <label>Description</label>
+                      <input type="text" value={settingsForm.trustItem4Desc || ''} onChange={e => setSettingsForm({...settingsForm, trustItem4Desc: e.target.value})} />
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div className="admin-section-box">
                 <h3 className="section-title">Admin Account Credentials</h3>
                 <div className="form-grid">
                   <div className="form-group">
@@ -1010,7 +1132,21 @@ function Admin() {
                   </div>
                   <div className="form-group">
                     <label>Admin Password</label>
-                    <input type="password" value={settingsForm.adminPassword || ''} onChange={e => setSettingsForm({...settingsForm, adminPassword: e.target.value})} />
+                    <div style={{ position: 'relative' }}>
+                      <input 
+                        type={showAdminPass ? "text" : "password"} 
+                        value={settingsForm.adminPassword || ''} 
+                        onChange={e => setSettingsForm({...settingsForm, adminPassword: e.target.value})} 
+                        style={{ paddingRight: '2.5rem' }}
+                      />
+                      <button 
+                        type="button" 
+                        onClick={() => setShowAdminPass(!showAdminPass)}
+                        style={{ position: 'absolute', right: '0.5rem', top: '50%', transform: 'translateY(-50%)', background: 'none', border: 'none', color: '#8b8e96', cursor: 'pointer', display: 'flex', alignItems: 'center' }}
+                      >
+                        {showAdminPass ? <Eye size={16} /> : <Lock size={16} />}
+                      </button>
+                    </div>
                   </div>
                 </div>
                 <p style={{ fontSize: '0.75rem', color: '#8b8e96', marginTop: '0.5rem' }}>

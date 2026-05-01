@@ -73,7 +73,7 @@ function Navbar() {
       {/* WhatsApp Button */}
       {settings.showWhatsApp && (
         <a 
-          href={`https://wa.me/${(settings.whatsappNumber || '').replace(/\D/g, '')}`} 
+          href={`https://api.whatsapp.com/send?phone=${(settings.whatsappNumber || '').replace(/\D/g, '')}`} 
           target="_blank" 
           rel="noopener noreferrer" 
           className="whatsapp-float"

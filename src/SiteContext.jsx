@@ -71,7 +71,30 @@ export function SiteProvider({ children }) {
     instagramUrl: '',
     tiktokUrl: '',
     shippingFlatRate: 200,
-    shippingFreeThreshold: 3000
+    shippingFreeThreshold: 3000,
+    // Announcement Bar Advanced
+    announcementFontSize: '14px',
+    announcementPadding: '10px',
+    announcementBgColor: '#2d6a4f',
+    announcementTextColor: '#ffffff',
+    // Navbar Advanced
+    navbarHeight: '76px',
+    navbarBgColor: 'rgba(255, 255, 255, 0.9)',
+    logoHeight: '64px',
+    // Trust Bar
+    showTrustBar: true,
+    trustItem1Title: 'Free Shipping',
+    trustItem1Desc: 'On orders above PKR 3000',
+    showTrustItem1: true,
+    trustItem2Title: 'Quality Guarantee',
+    trustItem2Desc: 'Premium fabrics only',
+    showTrustItem2: true,
+    trustItem3Title: 'Easy Returns',
+    trustItem3Desc: '7-day return policy',
+    showTrustItem3: true,
+    trustItem4Title: 'Support',
+    trustItem4Desc: "We're here to help",
+    showTrustItem4: true,
   });
 
   useEffect(() => {
