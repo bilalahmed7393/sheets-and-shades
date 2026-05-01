@@ -3,17 +3,20 @@ import {
   Lock, LogOut, Plus, Pencil, Trash2, Search,
   X, Package, ShoppingBag, Layers, Heart,
   CheckCircle, AlertCircle, Settings as SettingsIcon,
-  ClipboardList, ChevronDown, Eye
+  ClipboardList, ChevronDown, Eye, LayoutDashboard,
+  FileText, ExternalLink, TrendingUp, AlertTriangle
 } from 'lucide-react';
-import { getProducts, addProduct, updateProduct, deleteProduct, getNextId, updateSettings, getOrders, updateOrderStatus, deleteOrder as deleteOrderApi } from '../data';
+import { getProducts, addProduct, updateProduct, deleteProduct, getNextId, updateSettings, getOrders, updateOrderStatus, deleteOrder as deleteOrderApi, getDashboardStats } from '../data';
 import { useSiteSettings } from '../SiteContext';
 import './Admin.css';
 
-const ADMIN_PASSWORD = 'admin123';
+const ADMIN_USERNAME = 'zauq_admin';
+const ADMIN_PASSWORD = 'zauq2024!';
 
 function Admin() {
   const [isLoggedIn, setIsLoggedIn] = useState(() => sessionStorage.getItem('admin_auth') === 'true');
   const [password, setPassword] = useState('');
+  const [username, setUsername] = useState('');
   const [loginError, setLoginError] = useState('');
   const [products, setProducts] = useState([]);
   const [searchTerm, setSearchTerm] = useState('');
@@ -23,8 +26,9 @@ function Admin() {
   const [toast, setToast] = useState(null);
   const [orders, setOrders] = useState([]);
   const [selectedOrder, setSelectedOrder] = useState(null);
+  const [dashStats, setDashStats] = useState(null);
 
-  const [activeTab, setActiveTab] = useState('products');
+  const [activeTab, setActiveTab] = useState('dashboard');
   const { settings, updateLocalSettings } = useSiteSettings();
   const [settingsForm, setSettingsForm] = useState(settings);
 
@@ -41,6 +45,7 @@ function Admin() {
     if (isLoggedIn) {
       getProducts().then(setProducts);
       getOrders().then(setOrders).catch(() => {});
+      getDashboardStats().then(setDashStats).catch(() => {});
     }
   }, [isLoggedIn]);
 
@@ -53,12 +58,12 @@ function Admin() {
   // Login
   const handleLogin = (e) => {
     e.preventDefault();
-    if (password === ADMIN_PASSWORD) {
+    if (username === ADMIN_USERNAME && password === ADMIN_PASSWORD) {
       sessionStorage.setItem('admin_auth', 'true');
       setIsLoggedIn(true);
       setLoginError('');
     } else {
-      setLoginError('Incorrect password. Please try again.');
+      setLoginError('Invalid username or password.');
     }
   };
 
@@ -261,61 +266,111 @@ function Admin() {
   // =============== LOGIN SCREEN ===============
   if (!isLoggedIn) {
     return (
-      <div className="admin-layout admin-login">
-        <div className="login-card">
-          <div className="brand-text">{settings.siteName}</div>
-          <h1>Admin Portal</h1>
-          <p className="login-subtitle">Enter your password to manage products</p>
-          <form className="login-form" onSubmit={handleLogin}>
+      <div className="admin-login-page">
+        <div className="admin-login-card">
+          <h1>🛏️ {settings.siteName}</h1>
+          <p>Sign in to manage your store</p>
+          <form onSubmit={handleLogin}>
             {loginError && <div className="login-error">{loginError}</div>}
-            <div className="login-input-group">
-              <Lock size={18} />
-              <input
-                type="password"
-                className="login-input"
-                placeholder="Enter admin password"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                autoFocus
-              />
+            <div className="form-group-v2">
+              <label>Username</label>
+              <input type="text" placeholder="Enter username" value={username} onChange={e => setUsername(e.target.value)} autoFocus />
             </div>
-            <button type="submit" className="login-btn">Sign In</button>
+            <div className="form-group-v2">
+              <label>Password</label>
+              <input type="password" placeholder="Enter password" value={password} onChange={e => setPassword(e.target.value)} />
+            </div>
+            <button type="submit" className="btn-admin primary" style={{ width: '100%', marginTop: '0.5rem', padding: '0.8rem' }}>Sign In</button>
           </form>
         </div>
       </div>
     );
   }
 
-  // =============== DASHBOARD ===============
+  const tabLabel = { dashboard: 'Dashboard', products: 'Products', orders: 'Orders', settings: 'Website Content', storeSettings: 'Settings' };
+  const pendingCount = orders.filter(o => o.status === 'Pending').length;
+
+  // =============== MAIN LAYOUT ===============
   return (
-    <div className="admin-layout">
-      {/* Header */}
-      <header className="admin-header">
-        <div className="admin-header-left">
-          <div className="admin-brand">{settings.siteName}</div>
-          <span className="admin-badge">Admin</span>
+    <div className="admin-shell">
+      {/* Sidebar */}
+      <aside className="admin-sidebar">
+        <div className="sidebar-brand">
+          <h2>{settings.siteName}</h2>
+          <p>Admin Portal</p>
         </div>
-        <div className="admin-header-right">
-          <button className="admin-icon-btn danger" onClick={handleLogout}>
-            <LogOut size={16} /> Logout
+        <nav className="sidebar-nav">
+          <div className="sidebar-section-label">Main</div>
+          <button className={`sidebar-link ${activeTab === 'dashboard' ? 'active' : ''}`} onClick={() => setActiveTab('dashboard')}>
+            <LayoutDashboard size={18} /> <span>Dashboard</span>
           </button>
+          <button className={`sidebar-link ${activeTab === 'products' ? 'active' : ''}`} onClick={() => setActiveTab('products')}>
+            <Package size={18} /> <span>Products</span>
+          </button>
+          <button className={`sidebar-link ${activeTab === 'orders' ? 'active' : ''}`} onClick={() => setActiveTab('orders')}>
+            <ClipboardList size={18} /> <span>Orders</span>
+            {pendingCount > 0 && <span className="link-badge">{pendingCount}</span>}
+          </button>
+          <div className="sidebar-section-label">Content</div>
+          <button className={`sidebar-link ${activeTab === 'settings' ? 'active' : ''}`} onClick={() => setActiveTab('settings')}>
+            <FileText size={18} /> <span>Website Content</span>
+          </button>
+          <div className="sidebar-section-label">System</div>
+          <button className={`sidebar-link ${activeTab === 'storeSettings' ? 'active' : ''}`} onClick={() => setActiveTab('storeSettings')}>
+            <SettingsIcon size={18} /> <span>Settings</span>
+          </button>
+        </nav>
+        <div className="sidebar-footer">
+          <button className="btn-admin secondary" style={{ width: '100%' }} onClick={handleLogout}><LogOut size={14} /> Logout</button>
         </div>
-      </header>
+      </aside>
 
-      <div className="admin-tabs">
-        <button className={`tab-btn ${activeTab === 'products' ? 'active' : ''}`} onClick={() => setActiveTab('products')}>
-          <Package size={16} /> Products
-        </button>
-        <button className={`tab-btn ${activeTab === 'orders' ? 'active' : ''}`} onClick={() => setActiveTab('orders')}>
-          <ClipboardList size={16} /> Orders {orders.length > 0 && <span className="admin-badge" style={{ marginLeft: '0.25rem', fontSize: '0.65rem', padding: '0.15rem 0.5rem' }}>{orders.length}</span>}
-        </button>
-        <button className={`tab-btn ${activeTab === 'settings' ? 'active' : ''}`} onClick={() => setActiveTab('settings')}>
-          <SettingsIcon size={16} /> Website Content
-        </button>
-      </div>
+      {/* Content */}
+      <div className="admin-content">
+        <div className="admin-topbar">
+          <h1>{tabLabel[activeTab] || 'Admin'}</h1>
+          <div className="topbar-actions">
+            <a href="/" target="_blank" rel="noopener noreferrer" className="btn-admin secondary"><ExternalLink size={14} /> View Site</a>
+          </div>
+        </div>
+        <div className="admin-body">
 
-      <div className="admin-main">
-        {activeTab === 'products' ? (
+        {/* DASHBOARD */}
+        {activeTab === 'dashboard' && (
+          <>
+            <div className="stats-grid">
+              <div className="stat-card-v2"><div className="stat-icon-v2 green"><ShoppingBag size={22} /></div><div className="stat-info"><h3>{dashStats?.ordersToday ?? 0}</h3><p>Orders Today</p></div></div>
+              <div className="stat-card-v2"><div className="stat-icon-v2 gold"><TrendingUp size={22} /></div><div className="stat-info"><h3>PKR {(dashStats?.monthlyRevenue ?? 0).toLocaleString()}</h3><p>Revenue This Month</p></div></div>
+              <div className="stat-card-v2"><div className="stat-icon-v2 blue"><Package size={22} /></div><div className="stat-info"><h3>{dashStats?.totalProducts ?? 0}</h3><p>Total Products</p></div></div>
+              <div className="stat-card-v2"><div className="stat-icon-v2 red"><AlertCircle size={22} /></div><div className="stat-info"><h3>{dashStats?.pendingOrders ?? 0}</h3><p>Pending Orders</p></div></div>
+            </div>
+
+            <div className="admin-panel">
+              <h2>Recent Orders</h2>
+              {dashStats?.recentOrders?.length > 0 ? (
+                <table className="data-table"><thead><tr><th>Order ID</th><th>Customer</th><th>Amount</th><th>Status</th></tr></thead><tbody>
+                  {dashStats.recentOrders.map(o => (
+                    <tr key={o._id}><td style={{fontFamily:'monospace',fontSize:'0.8rem'}}>{o.orderNumber}</td><td>{o.customerName}</td><td>PKR {o.total?.toLocaleString()}</td><td><span className={`status-badge ${o.status?.toLowerCase()}`}>{o.status}</span></td></tr>
+                  ))}
+                </tbody></table>
+              ) : <p style={{color:'#8b8e96',fontSize:'0.9rem'}}>No orders yet.</p>}
+            </div>
+
+            {dashStats?.lowStockProducts?.length > 0 && (
+              <div className="admin-panel">
+                <h2><AlertTriangle size={16} style={{color:'#ef4444',marginRight:'0.5rem'}} />Low Stock Alerts</h2>
+                <table className="data-table"><thead><tr><th>Product</th><th>Stock</th></tr></thead><tbody>
+                  {dashStats.lowStockProducts.map(p => (
+                    <tr key={p.id}><td>{p.name}</td><td><span className="status-badge cancelled">{p.stockQuantity} left</span></td></tr>
+                  ))}
+                </tbody></table>
+              </div>
+            )}
+          </>
+        )}
+
+        {/* PRODUCTS */}
+        {activeTab === 'products' && (
           <>
             {/* Stats */}
         <div className="admin-stats">
@@ -424,7 +479,10 @@ function Admin() {
           </div>
         )}
           </>
-        ) : activeTab === 'orders' ? (
+        )}
+
+        {/* ORDERS */}
+        {activeTab === 'orders' && (
           <>
             {/* Orders Tab */}
             {selectedOrder ? (
@@ -546,7 +604,10 @@ function Admin() {
               </div>
             )}
           </>
-        ) : (
+        )}
+
+        {/* WEBSITE CONTENT */}
+        {activeTab === 'settings' && (
           <div className="settings-panel">
             <h2>Edit Website Content</h2>
             <form onSubmit={handleSettingsSave} className="settings-form">
@@ -645,7 +706,6 @@ function Admin() {
             </form>
           </div>
         )}
-      </div>
 
       {/* Add/Edit Modal */}
       {showModal && (
@@ -748,11 +808,14 @@ function Admin() {
 
       {/* Toast */}
       {toast && (
-        <div className={`toast ${toast.type}`}>
+        <div className={`admin-toast ${toast.type}`}>
           {toast.type === 'success' ? <CheckCircle size={18} /> : <AlertCircle size={18} />}
           {toast.message}
         </div>
       )}
+
+        </div>{/* end admin-body */}
+      </div>{/* end admin-content */}
     </div>
   );
 }
