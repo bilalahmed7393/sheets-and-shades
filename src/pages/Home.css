@@ -103,7 +103,7 @@
   width: 48px;
   height: 48px;
   border-radius: var(--radius-md);
-  background: linear-gradient(135deg, rgba(139, 115, 85, 0.1), rgba(139, 115, 85, 0.05));
+  background: linear-gradient(135deg, rgba(45, 106, 79, 0.1), rgba(45, 106, 79, 0.05));
   display: flex;
   align-items: center;
   justify-content: center;
@@ -237,7 +237,7 @@
 .cta-banner {
   margin-top: 5rem;
   padding: 4rem 3rem;
-  background: linear-gradient(135deg, var(--color-primary) 0%, #6d5a43 100%);
+  background: linear-gradient(135deg, var(--color-primary) 0%, #1b4332 100%);
   border-radius: var(--radius-xl);
   text-align: center;
   color: white;

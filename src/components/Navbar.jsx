@@ -18,11 +18,10 @@ function Navbar() {
       <header className="navbar">
         <div className="container navbar-content">
           <Link to="/" className="brand">
-            {settings.logoImage ? (
-              <img src={settings.logoImage} alt={settings.siteName} />
-            ) : (
-              settings.siteName
+            {settings.logoImage && (
+              <img src={settings.logoImage} alt={settings.siteName} className="brand-logo" />
             )}
+            <span className="brand-name">{settings.siteName}</span>
           </Link>
           <nav className="nav-links">
             <Link to="/" className={isActive('/')}>Home</Link>

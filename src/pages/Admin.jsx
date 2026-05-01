@@ -569,7 +569,14 @@ function Admin() {
               <div className="form-group">
                 <label>Logo Image</label>
                 <input type="file" accept="image/*" onChange={(e) => handleSettingsImageUpload(e, 'logoImage')} />
-                {settingsForm.logoImage && <img src={settingsForm.logoImage} alt="Logo Preview" style={{ height: '40px', objectFit: 'contain', marginTop: '0.5rem' }} />}
+                {settingsForm.logoImage && (
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', marginTop: '0.75rem' }}>
+                    <img src={settingsForm.logoImage} alt="Logo Preview" style={{ height: '60px', objectFit: 'contain' }} />
+                    <button type="button" className="admin-icon-btn danger" onClick={() => setSettingsForm({...settingsForm, logoImage: ''})} style={{ fontSize: '0.8rem' }}>
+                      <Trash2 size={14} /> Remove Logo
+                    </button>
+                  </div>
+                )}
               </div>
               <div className="form-group">
                 <label>Hero Background Image</label>

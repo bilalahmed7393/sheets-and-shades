@@ -1,14 +1,14 @@
 @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500&display=swap');
 
 :root {
-  --color-primary: #8b7355;
-  --color-primary-hover: #735d42;
-  --color-secondary: #8f9779;
+  --color-primary: #2d6a4f;
+  --color-primary-hover: #1b4332;
+  --color-secondary: #b5941f;
   --color-background: #faf9f6;
   --color-surface: #ffffff;
-  --color-text: #2c302e;
-  --color-text-light: #6a6f6b;
-  --color-border: #e8e6e1;
+  --color-text: #1a2e1f;
+  --color-text-light: #5c6e62;
+  --color-border: #dde5df;
   
   --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.04);
   --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.06);
@@ -107,12 +107,12 @@ img {
 .btn-primary {
   background: linear-gradient(135deg, var(--color-primary) 0%, var(--color-primary-hover) 100%);
   color: white;
-  box-shadow: 0 4px 15px rgba(139, 115, 85, 0.25);
+  box-shadow: 0 4px 15px rgba(45, 106, 79, 0.25);
 }
 
 .btn-primary:hover {
   transform: translateY(-2px);
-  box-shadow: 0 8px 25px rgba(139, 115, 85, 0.35);
+  box-shadow: 0 8px 25px rgba(45, 106, 79, 0.35);
 }
 
 .btn-primary:active {
@@ -128,7 +128,7 @@ img {
 .btn-outline:hover {
   border-color: var(--color-primary);
   color: var(--color-primary);
-  background: rgba(139, 115, 85, 0.05);
+  background: rgba(45, 106, 79, 0.05);
 }
 
 .glass-panel {
@@ -150,12 +150,12 @@ img {
 }
 
 .badge-new {
-  background: linear-gradient(135deg, var(--color-secondary), #7a8869);
+  background: linear-gradient(135deg, var(--color-secondary), #9a7c14);
   color: white;
 }
 
 .badge-preloved {
-  background: linear-gradient(135deg, var(--color-primary), #6d5a43);
+  background: linear-gradient(135deg, var(--color-primary), #1b4332);
   color: white;
 }
 
@@ -239,6 +239,6 @@ h2 {
 
 /* Selection */
 ::selection {
-  background: rgba(139, 115, 85, 0.2);
+  background: rgba(45, 106, 79, 0.2);
   color: var(--color-text);
 }

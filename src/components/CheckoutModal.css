@@ -192,14 +192,14 @@
 
 .checkout-field input:focus {
   outline: none;
-  border-color: var(--color-primary, #8b7355);
-  box-shadow: 0 0 0 3px rgba(139, 115, 85, 0.1);
+  border-color: var(--color-primary, #2d6a4f);
+  box-shadow: 0 0 0 3px rgba(45, 106, 79, 0.1);
 }
 
 .checkout-place-order-btn {
   width: 100%;
   padding: 1rem;
-  background: var(--color-primary, #8b7355);
+  background: var(--color-primary, #2d6a4f);
   color: #fff;
   border: none;
   border-radius: 0.5rem;
@@ -263,7 +263,7 @@
 .checkout-order-number {
   font-size: 0.9rem;
   font-weight: 600;
-  color: #8b7355;
+  color: #2d6a4f;
   letter-spacing: 0.03em;
   margin-bottom: 1rem !important;
 }
