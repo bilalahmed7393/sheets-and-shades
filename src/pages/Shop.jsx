@@ -51,7 +51,7 @@ function Shop() {
           <div className="filter-group">
             <h4>Category</h4>
             <div className="filter-options">
-              {['All', 'Bedsheets', 'Curtains'].map(cat => (
+              {['All', 'Bedsheets', 'Curtains', 'Pillow Covers', 'Comforters', 'Bundles'].map(cat => (
                 <label key={cat} className="filter-label">
                   <input 
                     type="radio" 

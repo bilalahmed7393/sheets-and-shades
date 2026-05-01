@@ -217,3 +217,45 @@
   background: var(--color-background);
   color: var(--color-primary);
 }
+
+/* Announcement Bar */
+.announcement-bar {
+  padding: 8px 0;
+  text-align: center;
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: white;
+  letter-spacing: 0.03em;
+}
+
+/* WhatsApp Floating Button */
+.whatsapp-float {
+  position: fixed;
+  bottom: 24px;
+  right: 24px;
+  width: 56px;
+  height: 56px;
+  background-color: #25d366;
+  color: white;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 4px 15px rgba(37, 211, 102, 0.4);
+  z-index: 99;
+  transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+.whatsapp-float:hover {
+  transform: scale(1.1) translateY(-5px);
+  box-shadow: 0 8px 20px rgba(37, 211, 102, 0.5);
+  background-color: #20bd5a;
+}
+
+@media (max-width: 768px) {
+  .whatsapp-float {
+    bottom: 80px; /* Stay above mobile bottom bar if any */
+    width: 50px;
+    height: 50px;
+  }
+}

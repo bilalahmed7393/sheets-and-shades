@@ -14,7 +14,8 @@ function Home() {
     getProducts().then(setProducts);
   }, []);
 
-  const featuredProducts = products.slice(0, 4);
+  const featuredProducts = products.filter(p => p.isFeatured).slice(0, 4);
+  if (featuredProducts.length === 0) featuredProducts.push(...products.slice(0, 4));
 
   return (
     <div className="home">
@@ -33,8 +34,8 @@ function Home() {
             <h1>{settings.heroHeadline}</h1>
             <p>{settings.heroSubtitle}</p>
             <div className="hero-actions">
-              <Link to="/shop" className="btn btn-primary">
-                Shop Collection <ArrowRight size={18} className="ml-2" />
+              <Link to={settings.heroCta1Link || "/shop"} className="btn btn-primary">
+                {settings.heroCta1Text || "Shop Collection"} <ArrowRight size={18} className="ml-2" />
               </Link>
               <Link to="/contact" className="btn btn-outline">
                 Contact Us
@@ -52,7 +53,7 @@ function Home() {
               <div className="trust-icon"><Truck size={22} /></div>
               <div className="trust-text">
                 <h4>Free Shipping</h4>
-                <p>On orders above PKR 3,000</p>
+                <p>On orders above PKR {settings.freeShippingThreshold || '5,000'}</p>
               </div>
             </div>
             <div className="trust-item">
@@ -86,14 +87,14 @@ function Home() {
           <img src={settings.categoryImage1} alt="Bedsheets" />
           <div className="category-overlay">
             <h3>Luxury Bedsheets</h3>
-            <Link to="/shop?category=bedsheets" className="btn btn-outline btn-light">Shop Sheets</Link>
+            <Link to="/shop?category=Bedsheets" className="btn btn-outline btn-light">Shop Sheets</Link>
           </div>
         </div>
         <div className="category-card">
           <img src={settings.categoryImage2} alt="Curtains" />
           <div className="category-overlay">
             <h3>Elegant Curtains</h3>
-            <Link to="/shop?category=curtains" className="btn btn-outline btn-light">Shop Curtains</Link>
+            <Link to="/shop?category=Curtains" className="btn btn-outline btn-light">Shop Curtains</Link>
           </div>
         </div>
       </section>
@@ -102,8 +103,8 @@ function Home() {
       <section className="featured-products container">
         <div className="section-header">
           <div>
-            <h2>Trending Now</h2>
-            <p className="section-subtitle">Our most popular picks this season</p>
+            <h2>Featured Collection</h2>
+            <p className="section-subtitle">Handpicked premium items just for you</p>
           </div>
           <Link to="/shop" className="view-all-link">View All <ArrowRight size={16} /></Link>
         </div>
@@ -115,10 +116,10 @@ function Home() {
       </section>
 
       {/* CTA Banner */}
-      <section className="container" style={{ paddingBottom: '2rem' }}>
+      <section className="container" style={{ paddingBottom: '4rem' }}>
         <div className="cta-banner">
           <h2>Comfort Meets Style</h2>
-          <p>Explore our curated collection of premium bedding and curtains for your dream home.</p>
+          <p>{settings.aboutText?.substring(0, 150) || "Explore our curated collection of premium bedding and curtains for your dream home."}...</p>
           <Link to="/shop" className="btn">Browse Collection</Link>
         </div>
       </section>
