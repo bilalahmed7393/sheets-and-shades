@@ -11,7 +11,7 @@ function Shop() {
   const initialCategory = searchParams.get('category');
   const initialCondition = searchParams.get('condition');
 
-  const products = getProducts();
+
   const [filterCategory, setFilterCategory] = useState(initialCategory || 'All');
   const [filterCondition, setFilterCondition] = useState(initialCondition || 'All');
 
