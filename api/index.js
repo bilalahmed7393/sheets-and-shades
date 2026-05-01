@@ -98,7 +98,21 @@ const settingsSchema = new mongoose.Schema({
   logoHeight: { type: String, default: '64px' },
   // Admin
   adminUsername: { type: String, default: 'zauq_admin' },
-  adminPassword: { type: String, default: 'zauq2024!' }
+  adminPassword: { type: String, default: 'zauq2024!' },
+  // Trust Bar
+  showTrustBar: { type: Boolean, default: true },
+  trustItem1Title: { type: String, default: 'Free Shipping' },
+  trustItem1Desc: { type: String, default: 'On orders above PKR 3000' },
+  showTrustItem1: { type: Boolean, default: true },
+  trustItem2Title: { type: String, default: 'Quality Guarantee' },
+  trustItem2Desc: { type: String, default: 'Premium fabrics only' },
+  showTrustItem2: { type: Boolean, default: true },
+  trustItem3Title: { type: String, default: 'Easy Returns' },
+  trustItem3Desc: { type: String, default: '7-day return policy' },
+  showTrustItem3: { type: Boolean, default: true },
+  trustItem4Title: { type: String, default: 'Support' },
+  trustItem4Desc: { type: String, default: "We're here to help" },
+  showTrustItem4: { type: Boolean, default: true },
 });
 
 const Settings = mongoose.models.Settings || mongoose.model('Settings', settingsSchema);

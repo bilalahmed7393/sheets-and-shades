@@ -46,40 +46,50 @@ function Home() {
       </section>
 
       {/* Trust Bar */}
-      <section className="trust-bar">
-        <div className="container">
-          <div className="trust-items">
-            <div className="trust-item">
-              <div className="trust-icon"><Truck size={22} /></div>
-              <div className="trust-text">
-                <h4>Free Shipping</h4>
-                <p>On orders above PKR {settings.shippingFreeThreshold || '3,000'}</p>
-              </div>
-            </div>
-            <div className="trust-item">
-              <div className="trust-icon"><Shield size={22} /></div>
-              <div className="trust-text">
-                <h4>Quality Guarantee</h4>
-                <p>Premium fabrics only</p>
-              </div>
-            </div>
-            <div className="trust-item">
-              <div className="trust-icon"><RefreshCw size={22} /></div>
-              <div className="trust-text">
-                <h4>Easy Returns</h4>
-                <p>7-day return policy</p>
-              </div>
-            </div>
-            <div className="trust-item">
-              <div className="trust-icon"><Headphones size={22} /></div>
-              <div className="trust-text">
-                <h4>Support</h4>
-                <p>We're here to help</p>
-              </div>
+      {settings.showTrustBar !== false && (
+        <section className="trust-bar">
+          <div className="container">
+            <div className="trust-items">
+              {settings.showTrustItem1 !== false && (
+                <div className="trust-item">
+                  <div className="trust-icon"><Truck size={22} /></div>
+                  <div className="trust-text">
+                    <h4>{settings.trustItem1Title || 'Free Shipping'}</h4>
+                    <p>{settings.trustItem1Desc || `On orders above PKR ${settings.shippingFreeThreshold || '3,000'}`}</p>
+                  </div>
+                </div>
+              )}
+              {settings.showTrustItem2 !== false && (
+                <div className="trust-item">
+                  <div className="trust-icon"><Shield size={22} /></div>
+                  <div className="trust-text">
+                    <h4>{settings.trustItem2Title || 'Quality Guarantee'}</h4>
+                    <p>{settings.trustItem2Desc || 'Premium fabrics only'}</p>
+                  </div>
+                </div>
+              )}
+              {settings.showTrustItem3 !== false && (
+                <div className="trust-item">
+                  <div className="trust-icon"><RefreshCw size={22} /></div>
+                  <div className="trust-text">
+                    <h4>{settings.trustItem3Title || 'Easy Returns'}</h4>
+                    <p>{settings.trustItem3Desc || '7-day return policy'}</p>
+                  </div>
+                </div>
+              )}
+              {settings.showTrustItem4 !== false && (
+                <div className="trust-item">
+                  <div className="trust-icon"><Headphones size={22} /></div>
+                  <div className="trust-text">
+                    <h4>{settings.trustItem4Title || 'Support'}</h4>
+                    <p>{settings.trustItem4Desc || "We're here to help"}</p>
+                  </div>
+                </div>
+              )}
             </div>
           </div>
-        </div>
-      </section>
+        </section>
+      )}
 
       {/* Categories Section */}
       <section className="categories container">

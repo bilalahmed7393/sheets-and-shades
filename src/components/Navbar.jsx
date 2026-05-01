@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import { ShoppingBag, Menu, X, Home, Store, Heart, HelpCircle, Truck, Phone } from 'lucide-react';
+import { ShoppingBag, Menu, X, Home, Store, Heart, HelpCircle, Truck, Phone, MessageCircle } from 'lucide-react';
 import { useSiteSettings } from '../SiteContext';
 import { useCart } from '../CartContext';
 import './Navbar.css';
@@ -71,16 +71,16 @@ function Navbar() {
       </header>
 
       {/* WhatsApp Button */}
-      {settings.showWhatsApp && settings.whatsappNumber && (
+      {settings.showWhatsApp && (
         <a 
-          href={`https://wa.me/${settings.whatsappNumber.replace(/\D/g, '')}`} 
+          href={`https://wa.me/${(settings.whatsappNumber || '').replace(/\D/g, '')}`} 
           target="_blank" 
           rel="noopener noreferrer" 
           className="whatsapp-float"
-          style={{ zIndex: 99999 }}
+          style={{ zIndex: 9999999 }}
           aria-label="Contact on WhatsApp"
         >
-          <Phone size={24} />
+          <MessageCircle size={28} />
         </a>
       )}
 
