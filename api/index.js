@@ -23,8 +23,18 @@ const productSchema = new mongoose.Schema({
   category: { type: String, required: true },
   condition: { type: String, required: true },
   price: { type: Number, required: true },
+  salePrice: { type: Number, default: 0 },
   image: { type: String },
-  description: { type: String }
+  images: [{ type: String }],
+  description: { type: String },
+  sku: { type: String, default: '' },
+  stockQuantity: { type: Number, default: 50 },
+  material: { type: String, default: '' },
+  sizes: [{ type: String }],
+  colors: [{ type: String }],
+  badge: { type: String, default: 'None', enum: ['None', 'New Arrival', 'Best Seller', 'Sale', 'Limited Edition'] },
+  isFeatured: { type: Boolean, default: false },
+  isActive: { type: Boolean, default: true }
 });
 
 const Product = mongoose.models.Product || mongoose.model('Product', productSchema);
@@ -32,21 +42,65 @@ const Product = mongoose.models.Product || mongoose.model('Product', productSche
 // Settings Schema
 const settingsSchema = new mongoose.Schema({
   id: { type: String, default: 'global' },
+  // Branding
   siteName: { type: String, default: 'ZAUQ Bedding & More' },
+  siteTagline: { type: String, default: 'Premium Bedding & Home Decor' },
+  logoImage: { type: String, default: '' },
+  // Hero
   heroHeadline: { type: String, default: 'Curated Comfort for Your Home' },
   heroSubtitle: { type: String, default: 'Discover our premium collection of pre-loved and new bedsheets and curtains.' },
-  aboutText: { type: String, default: 'A marketplace for premium bedsheets and curtains.' },
-  logoImage: { type: String, default: '' },
   heroBackgroundImage: { type: String, default: 'https://images.unsplash.com/photo-1616046229478-9901c5536a45?ixlib=rb-4.0.3&auto=format&fit=crop&w=1600&q=80' },
+  heroCta1Text: { type: String, default: 'Shop Collection' },
+  heroCta1Link: { type: String, default: '/shop' },
+  heroCta2Text: { type: String, default: 'Contact Us' },
+  heroCta2Link: { type: String, default: '/contact' },
+  // Announcement Bar
+  announcementEnabled: { type: Boolean, default: false },
+  announcementText: { type: String, default: '🎉 Free shipping on orders above PKR 3,000!' },
+  announcementBgColor: { type: String, default: '#2d6a4f' },
+  announcementLink: { type: String, default: '/shop' },
+  // Category images
   categoryImage1: { type: String, default: 'https://images.unsplash.com/photo-1522771731478-40b95bc8e4f1?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80' },
   categoryImage2: { type: String, default: 'https://images.unsplash.com/photo-1513694203232-719a280e022f?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80' },
-  primaryColor: { type: String, default: '#8b7355' },
-  secondaryColor: { type: String, default: '#8f9779' },
+  // About
+  aboutText: { type: String, default: 'A marketplace for premium bedsheets and curtains.' },
+  // Theme
+  primaryColor: { type: String, default: '#2d6a4f' },
+  secondaryColor: { type: String, default: '#b5941f' },
   backgroundColor: { type: String, default: '#faf9f6' },
-  textColor: { type: String, default: '#2c302e' },
-  faqContent: { type: String, default: '<h3>How do I place an order?</h3>\n<p>Simply browse our collection, add items to your cart, and proceed to checkout. Fill in your shipping details and your order will be confirmed instantly.</p>\n\n<h3>What payment methods do you accept?</h3>\n<p>We accept cash on delivery (COD) for all orders within Pakistan.</p>\n\n<h3>Can I return or exchange a product?</h3>\n<p>Yes! We offer hassle-free returns and exchanges within 7 days of delivery. Please ensure the product is in its original condition.</p>\n\n<h3>How long does delivery take?</h3>\n<p>Standard delivery takes 3-5 business days across Pakistan. Express delivery options are available at checkout.</p>' },
-  shippingContent: { type: String, default: '<h3>Shipping Policy</h3>\n<p>We ship to all major cities across Pakistan. Standard shipping takes 3-5 business days.</p>\n\n<h3>Shipping Rates</h3>\n<p>Free shipping on orders above PKR 3,000. A flat rate of PKR 200 applies to orders below this amount.</p>\n\n<h3>Returns & Exchanges</h3>\n<p>We want you to love your purchase. If you are not satisfied, you may return or exchange the item within 7 days of delivery. The product must be unused and in its original packaging.</p>\n\n<h3>Refund Process</h3>\n<p>Once we receive your returned item, we will inspect it and process your refund within 3-5 business days.</p>' },
-  contactContent: { type: String, default: '<h3>Get in Touch</h3>\n<p>We would love to hear from you! Whether you have a question about our products, need help with an order, or just want to say hello, feel free to reach out.</p>\n\n<h3>Email</h3>\n<p>support@zauqbedding.com</p>\n\n<h3>Phone</h3>\n<p>+92 300 1234567</p>\n\n<h3>Business Hours</h3>\n<p>Monday - Saturday: 10:00 AM - 8:00 PM (PKT)<br>Sunday: Closed</p>' }
+  textColor: { type: String, default: '#1a2e1f' },
+  // Support Pages
+  faqContent: { type: String, default: '' },
+  shippingContent: { type: String, default: '' },
+  contactContent: { type: String, default: '' },
+  // WhatsApp
+  whatsappEnabled: { type: Boolean, default: false },
+  whatsappNumber: { type: String, default: '' },
+  // Social
+  socialInstagram: { type: String, default: '' },
+  socialFacebook: { type: String, default: '' },
+  socialTiktok: { type: String, default: '' },
+  // Footer
+  footerTagline: { type: String, default: 'Premium bedding and curtains for your home.' },
+  footerAddress: { type: String, default: '' },
+  footerPhone: { type: String, default: '' },
+  footerEmail: { type: String, default: '' },
+  copyrightText: { type: String, default: '' },
+  // Shipping settings
+  shippingFlatRate: { type: Number, default: 200 },
+  shippingFreeEnabled: { type: Boolean, default: true },
+  shippingFreeThreshold: { type: Number, default: 3000 },
+  shippingEstimate: { type: String, default: '3-5 business days' },
+  // Payment settings
+  paymentCodEnabled: { type: Boolean, default: true },
+  paymentBankEnabled: { type: Boolean, default: false },
+  bankName: { type: String, default: '' },
+  bankAccountTitle: { type: String, default: '' },
+  bankAccountNumber: { type: String, default: '' },
+  bankIban: { type: String, default: '' },
+  // Admin
+  adminUsername: { type: String, default: 'zauq_admin' },
+  adminPassword: { type: String, default: 'zauq2024!' }
 });
 
 const Settings = mongoose.models.Settings || mongoose.model('Settings', settingsSchema);
@@ -157,6 +211,38 @@ app.put('/api/settings', async (req, res) => {
     res.json(updated);
   } catch (error) {
     res.status(400).json({ message: error.message });
+  }
+});
+
+// GET Dashboard Stats
+app.get('/api/stats', async (req, res) => {
+  try {
+    const totalProducts = await Product.countDocuments();
+    const totalOrders = await Order.countDocuments();
+    const pendingOrders = await Order.countDocuments({ status: 'Pending' });
+    const lowStockProducts = await Product.find({ stockQuantity: { $lt: 5 } }).select('id name stockQuantity image');
+    
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    const ordersToday = await Order.countDocuments({ createdAt: { $gte: today } });
+    
+    const monthStart = new Date(today.getFullYear(), today.getMonth(), 1);
+    const monthlyOrders = await Order.find({ createdAt: { $gte: monthStart } });
+    const monthlyRevenue = monthlyOrders.reduce((sum, o) => sum + o.total, 0);
+    
+    const recentOrders = await Order.find().sort({ createdAt: -1 }).limit(5);
+    
+    res.json({
+      totalProducts,
+      totalOrders,
+      pendingOrders,
+      ordersToday,
+      monthlyRevenue,
+      lowStockProducts,
+      recentOrders
+    });
+  } catch (error) {
+    res.status(500).json({ message: error.message });
   }
 });
 

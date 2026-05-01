@@ -250,3 +250,11 @@ export async function deleteOrder(id) {
   return res.json();
 }
 
+/**
+ * Fetch dashboard stats.
+ */
+export async function getDashboardStats() {
+  const res = await fetch('/api/stats');
+  if (!res.ok) throw new Error('Failed to fetch stats');
+  return res.json();
+}
