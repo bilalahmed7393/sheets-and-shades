@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { SlidersHorizontal } from 'lucide-react';
 import ProductCard from '../components/ProductCard';
-import { products } from '../data';
+import { getProducts } from '../data';
 import './Shop.css';
 
 function Shop() {
@@ -10,6 +10,7 @@ function Shop() {
   const initialCategory = searchParams.get('category');
   const initialCondition = searchParams.get('condition');
 
+  const products = getProducts();
   const [filterCategory, setFilterCategory] = useState(initialCategory || 'All');
   const [filterCondition, setFilterCondition] = useState(initialCondition || 'All');
 

@@ -1,10 +1,11 @@
 import { Link } from 'react-router-dom';
 import { ArrowRight } from 'lucide-react';
 import ProductCard from '../components/ProductCard';
-import { products } from '../data';
+import { getProducts } from '../data';
 import './Home.css';
 
 function Home() {
+  const products = getProducts();
   const featuredProducts = products.slice(0, 4);
 
   return (

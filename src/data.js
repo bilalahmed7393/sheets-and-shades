@@ -1,4 +1,4 @@
-export const products = [
+export const defaultProducts = [
   {
     id: 1,
     name: "Egyptian Cotton Percale Sheet Set",
@@ -54,3 +54,86 @@ export const products = [
     description: "Handcrafted macrame backdrop, slightly weathered for a vintage look."
   }
 ];
+
+const STORAGE_KEY = 'sheets_and_shades_products';
+
+/**
+ * Get all products. Reads from localStorage first, falls back to defaults.
+ */
+export function getProducts() {
+  try {
+    const stored = localStorage.getItem(STORAGE_KEY);
+    if (stored) {
+      return JSON.parse(stored);
+    }
+  } catch (e) {
+    console.warn('Failed to read products from localStorage:', e);
+  }
+  return [...defaultProducts];
+}
+
+/**
+ * Save the full product array to localStorage.
+ */
+export function saveProducts(products) {
+  try {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(products));
+  } catch (e) {
+    console.error('Failed to save products to localStorage:', e);
+  }
+}
+
+/**
+ * Generate the next available product ID.
+ */
+export function getNextId(products) {
+  if (products.length === 0) return 1;
+  return Math.max(...products.map(p => p.id)) + 1;
+}
+
+/**
+ * Export products as a downloadable JSON file.
+ */
+export function exportProducts() {
+  const products = getProducts();
+  const blob = new Blob([JSON.stringify(products, null, 2)], { type: 'application/json' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = `sheets-and-shades-catalog-${new Date().toISOString().slice(0, 10)}.json`;
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  URL.revokeObjectURL(url);
+}
+
+/**
+ * Import products from a JSON file. Returns a promise that resolves with the imported products.
+ */
+export function importProducts(file) {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      try {
+        const products = JSON.parse(e.target.result);
+        if (!Array.isArray(products)) {
+          reject(new Error('Invalid format: expected an array of products.'));
+          return;
+        }
+        saveProducts(products);
+        resolve(products);
+      } catch (err) {
+        reject(new Error('Invalid JSON file.'));
+      }
+    };
+    reader.onerror = () => reject(new Error('Failed to read file.'));
+    reader.readAsText(file);
+  });
+}
+
+/**
+ * Reset products back to defaults.
+ */
+export function resetProducts() {
+  localStorage.removeItem(STORAGE_KEY);
+}
