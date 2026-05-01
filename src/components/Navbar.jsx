@@ -13,6 +13,10 @@ function Navbar() {
 
   const isActive = (path) => location.pathname === path ? 'active' : '';
 
+  // Build the WhatsApp URL safely
+  const whatsappDigits = (settings.whatsappNumber || '').replace(/\D/g, '');
+  const whatsappUrl = `https://api.whatsapp.com/send?phone=${whatsappDigits}`;
+
   return (
     <>
       {settings.showAnnouncement && (
@@ -70,17 +74,18 @@ function Navbar() {
         </div>
       </header>
 
-      {/* WhatsApp Button */}
+      {/* WhatsApp Floating Button */}
       {settings.showWhatsApp && (
         <a 
-          href={`https://api.whatsapp.com/send?phone=${(settings.whatsappNumber || '').replace(/\D/g, '')}`} 
+          href={whatsappUrl} 
           target="_blank" 
           rel="noopener noreferrer" 
           className="whatsapp-float"
-          style={{ zIndex: 9999999 }}
           aria-label="Contact on WhatsApp"
         >
-          <MessageCircle size={28} />
+          <svg viewBox="0 0 32 32" width="28" height="28" fill="currentColor">
+            <path d="M16.004 0h-.008C7.174 0 0 7.176 0 16c0 3.5 1.128 6.744 3.046 9.378L1.054 31.29l6.118-1.958A15.905 15.905 0 0016.004 32C24.826 32 32 24.822 32 16S24.826 0 16.004 0zm9.338 22.594c-.39 1.1-1.932 2.014-3.166 2.28-.844.18-1.946.324-5.658-1.216-4.75-1.968-7.806-6.79-8.04-7.104-.226-.314-1.886-2.512-1.886-4.79s1.194-3.4 1.618-3.866c.424-.466.924-.582 1.232-.582.308 0 .616.002.886.016.284.014.666-.108 1.042.794.39.934 1.324 3.232 1.44 3.466.116.234.194.506.038.82-.156.314-.232.51-.466.786-.232.274-.49.612-.698.822-.232.234-.474.488-.204.958.272.47 1.208 1.992 2.594 3.228 1.782 1.588 3.282 2.08 3.75 2.314.468.234.742.194 1.014-.116.274-.312 1.168-1.356 1.48-1.822.31-.466.62-.39 1.048-.234.428.156 2.726 1.286 3.194 1.52.468.234.78.35.894.544.116.194.116 1.126-.274 2.226z"/>
+          </svg>
         </a>
       )}
 

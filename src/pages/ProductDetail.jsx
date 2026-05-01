@@ -151,7 +151,7 @@ function ProductDetail() {
               </button>
               {settings.whatsappNumber && (
                 <a 
-                  href={`https://wa.me/${settings.whatsappNumber.replace(/\D/g, '')}?text=Hi, I am interested in ${product.name}`}
+                  href={`https://api.whatsapp.com/send?phone=${(settings.whatsappNumber || '').replace(/\D/g, '')}&text=${encodeURIComponent(`Hi, I am interested in ${product.name}`)}`}
                   target="_blank"
                   rel="noopener noreferrer"
                   className="whatsapp-query-btn"

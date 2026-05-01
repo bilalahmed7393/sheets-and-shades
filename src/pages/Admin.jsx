@@ -968,6 +968,7 @@ function Admin() {
                   <div className="form-group">
                     <label>WhatsApp Number (with country code)</label>
                     <input type="text" value={settingsForm.whatsappNumber || ''} onChange={e => setSettingsForm({...settingsForm, whatsappNumber: e.target.value})} placeholder="e.g. 923001234567" />
+                    <p style={{ fontSize: '0.7rem', color: '#8b8e96', marginTop: '0.25rem' }}>Enter digits only with country code. For Pakistan: 92 + number (e.g. 923001234567)</p>
                   </div>
                   <div className="form-group">
                     <label>Store Address</label>
@@ -982,18 +983,19 @@ function Admin() {
 
               <div className="admin-section-box">
                 <h3 className="section-title">Social Media Links</h3>
+                <p style={{ fontSize: '0.75rem', color: '#8b8e96', marginBottom: '1rem' }}>Enter full URLs starting with https://</p>
                 <div className="form-grid">
                   <div className="form-group">
                     <label>Facebook URL</label>
-                    <input type="text" value={settingsForm.facebookUrl || ''} onChange={e => setSettingsForm({...settingsForm, facebookUrl: e.target.value})} />
+                    <input type="text" value={settingsForm.facebookUrl || ''} onChange={e => setSettingsForm({...settingsForm, facebookUrl: e.target.value})} placeholder="https://web.facebook.com/yourpage" />
                   </div>
                   <div className="form-group">
                     <label>Instagram URL</label>
-                    <input type="text" value={settingsForm.instagramUrl || ''} onChange={e => setSettingsForm({...settingsForm, instagramUrl: e.target.value})} />
+                    <input type="text" value={settingsForm.instagramUrl || ''} onChange={e => setSettingsForm({...settingsForm, instagramUrl: e.target.value})} placeholder="https://instagram.com/yourpage" />
                   </div>
                   <div className="form-group">
-                    <label>Tiktok URL</label>
-                    <input type="text" value={settingsForm.tiktokUrl || ''} onChange={e => setSettingsForm({...settingsForm, tiktokUrl: e.target.value})} />
+                    <label>TikTok URL</label>
+                    <input type="text" value={settingsForm.tiktokUrl || ''} onChange={e => setSettingsForm({...settingsForm, tiktokUrl: e.target.value})} placeholder="https://tiktok.com/@yourpage" />
                   </div>
                 </div>
               </div>
