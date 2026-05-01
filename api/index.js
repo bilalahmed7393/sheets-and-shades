@@ -43,7 +43,10 @@ const settingsSchema = new mongoose.Schema({
   primaryColor: { type: String, default: '#8b7355' },
   secondaryColor: { type: String, default: '#8f9779' },
   backgroundColor: { type: String, default: '#faf9f6' },
-  textColor: { type: String, default: '#2c302e' }
+  textColor: { type: String, default: '#2c302e' },
+  faqContent: { type: String, default: '<h3>How do I place an order?</h3>\n<p>Simply browse our collection, add items to your cart, and proceed to checkout. Fill in your shipping details and your order will be confirmed instantly.</p>\n\n<h3>What payment methods do you accept?</h3>\n<p>We accept cash on delivery (COD) for all orders within Pakistan.</p>\n\n<h3>Can I return or exchange a product?</h3>\n<p>Yes! We offer hassle-free returns and exchanges within 7 days of delivery. Please ensure the product is in its original condition.</p>\n\n<h3>How long does delivery take?</h3>\n<p>Standard delivery takes 3-5 business days across Pakistan. Express delivery options are available at checkout.</p>' },
+  shippingContent: { type: String, default: '<h3>Shipping Policy</h3>\n<p>We ship to all major cities across Pakistan. Standard shipping takes 3-5 business days.</p>\n\n<h3>Shipping Rates</h3>\n<p>Free shipping on orders above PKR 3,000. A flat rate of PKR 200 applies to orders below this amount.</p>\n\n<h3>Returns & Exchanges</h3>\n<p>We want you to love your purchase. If you are not satisfied, you may return or exchange the item within 7 days of delivery. The product must be unused and in its original packaging.</p>\n\n<h3>Refund Process</h3>\n<p>Once we receive your returned item, we will inspect it and process your refund within 3-5 business days.</p>' },
+  contactContent: { type: String, default: '<h3>Get in Touch</h3>\n<p>We would love to hear from you! Whether you have a question about our products, need help with an order, or just want to say hello, feel free to reach out.</p>\n\n<h3>Email</h3>\n<p>support@zauqbedding.com</p>\n\n<h3>Phone</h3>\n<p>+92 300 1234567</p>\n\n<h3>Business Hours</h3>\n<p>Monday - Saturday: 10:00 AM - 8:00 PM (PKT)<br>Sunday: Closed</p>' }
 });
 
 const Settings = mongoose.models.Settings || mongoose.model('Settings', settingsSchema);

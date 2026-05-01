@@ -619,6 +619,21 @@ function Admin() {
                 </div>
               </div>
 
+              <h2 style={{ marginTop: '2rem' }}>Support Pages</h2>
+              <p style={{ color: '#8b8e96', fontSize: '0.85rem', marginBottom: '1rem' }}>Edit the content for your FAQ, Shipping, and Contact pages. You can use basic HTML tags like &lt;h3&gt;, &lt;p&gt;, &lt;ul&gt;, &lt;li&gt;, &lt;strong&gt;, &lt;br&gt; for formatting.</p>
+              <div className="form-group">
+                <label>FAQ Page Content</label>
+                <textarea value={settingsForm.faqContent || ''} onChange={e => setSettingsForm({...settingsForm, faqContent: e.target.value})} rows={10} style={{ fontFamily: 'monospace', fontSize: '0.85rem' }} />
+              </div>
+              <div className="form-group">
+                <label>Shipping & Returns Page Content</label>
+                <textarea value={settingsForm.shippingContent || ''} onChange={e => setSettingsForm({...settingsForm, shippingContent: e.target.value})} rows={10} style={{ fontFamily: 'monospace', fontSize: '0.85rem' }} />
+              </div>
+              <div className="form-group">
+                <label>Contact Us Page Content</label>
+                <textarea value={settingsForm.contactContent || ''} onChange={e => setSettingsForm({...settingsForm, contactContent: e.target.value})} rows={10} style={{ fontFamily: 'monospace', fontSize: '0.85rem' }} />
+              </div>
+
               <button type="submit" className="btn btn-primary">Save Content</button>
             </form>
           </div>

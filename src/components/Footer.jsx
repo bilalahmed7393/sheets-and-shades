@@ -1,3 +1,4 @@
+import { Link } from 'react-router-dom';
 import { useSiteSettings } from '../SiteContext';
 import './Footer.css';
 
@@ -13,18 +14,18 @@ function Footer() {
         <div className="footer-links">
           <h4>Shop</h4>
           <ul>
-            <li><a href="/shop?category=bedsheets">Bedsheets</a></li>
-            <li><a href="/shop?category=curtains">Curtains</a></li>
-            <li><a href="/shop?condition=pre-loved">Pre-loved</a></li>
-            <li><a href="/shop?condition=new">New Arrivals</a></li>
+            <li><Link to="/shop?category=bedsheets">Bedsheets</Link></li>
+            <li><Link to="/shop?category=curtains">Curtains</Link></li>
+            <li><Link to="/shop?condition=pre-loved">Pre-loved</Link></li>
+            <li><Link to="/shop?condition=new">New Arrivals</Link></li>
           </ul>
         </div>
         <div className="footer-links">
           <h4>Support</h4>
           <ul>
-            <li><a href="#">FAQ</a></li>
-            <li><a href="#">Shipping & Returns</a></li>
-            <li><a href="#">Contact Us</a></li>
+            <li><Link to="/faq">FAQ</Link></li>
+            <li><Link to="/shipping">Shipping & Returns</Link></li>
+            <li><Link to="/contact">Contact Us</Link></li>
           </ul>
         </div>
       </div>

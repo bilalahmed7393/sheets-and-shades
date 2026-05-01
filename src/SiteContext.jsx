@@ -54,7 +54,10 @@ export function SiteProvider({ children }) {
     primaryColor: '#8b7355',
     secondaryColor: '#8f9779',
     backgroundColor: '#faf9f6',
-    textColor: '#2c302e'
+    textColor: '#2c302e',
+    faqContent: '',
+    shippingContent: '',
+    contactContent: ''
   });
 
   useEffect(() => {
