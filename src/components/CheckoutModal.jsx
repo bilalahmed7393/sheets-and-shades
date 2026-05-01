@@ -73,14 +73,18 @@ function CheckoutModal({ isOpen, onClose }) {
                     <img src={item.image} alt={item.name} />
                     <div>
                       <p className="checkout-item-name">{item.name}</p>
-                      <p className="checkout-item-qty">Qty: {item.quantity}</p>
+                      <p className="checkout-item-qty">
+                        Qty: {item.quantity} 
+                        {item.selectedSize && ` | Size: ${item.selectedSize}`}
+                        {item.selectedColor && ` | Color: ${item.selectedColor}`}
+                      </p>
                     </div>
-                    <span className="checkout-item-price">${(item.price * item.quantity).toFixed(2)}</span>
+                    <span className="checkout-item-price">PKR {(item.price * item.quantity).toLocaleString()}</span>
                   </div>
                 ))}
                 <div className="checkout-summary-total">
                   <span>Total</span>
-                  <span>${cartTotal.toFixed(2)}</span>
+                  <span>PKR {cartTotal.toLocaleString()}</span>
                 </div>
               </div>
 
@@ -119,7 +123,7 @@ function CheckoutModal({ isOpen, onClose }) {
                 {step === 'submitting' ? (
                   <><Loader size={18} className="spin" /> Placing Order...</>
                 ) : (
-                  `Place Order — $${cartTotal.toFixed(2)}`
+                  `Place Order — PKR ${cartTotal.toLocaleString()}`
                 )}
               </button>
             </form>
@@ -131,7 +135,7 @@ function CheckoutModal({ isOpen, onClose }) {
             </div>
             <h2>Order Confirmed!</h2>
             <p className="checkout-order-number">Order #{orderNumber}</p>
-            <p>Thank you, <strong>{form.name}</strong>! Your order of <strong>${cartTotal.toFixed(2)}</strong> has been placed successfully.</p>
+            <p>Thank you, <strong>{form.name}</strong>! Your order of <strong>PKR {cartTotal.toLocaleString()}</strong> has been placed successfully.</p>
             <p className="checkout-success-sub">We'll send a confirmation email to <strong>{form.email}</strong> with your tracking details.</p>
             <button className="btn btn-primary" onClick={clearCartAndClose}>
               Continue Shopping

@@ -16,17 +16,36 @@ function Navbar() {
   return (
     <>
       {settings.showAnnouncement && (
-        <div className="announcement-bar" style={{ background: settings.primaryColor || '#2d6a4f' }}>
+        <div 
+          className="announcement-bar" 
+          style={{ 
+            background: settings.announcementBgColor || settings.primaryColor || '#2d6a4f',
+            color: settings.announcementTextColor || '#ffffff',
+            fontSize: settings.announcementFontSize || '0.8rem',
+            padding: settings.announcementPadding || '8px 0'
+          }}
+        >
           <div className="container">
             <p>{settings.announcementText || 'Free delivery on orders over PKR 5000!'}</p>
           </div>
         </div>
       )}
-      <header className="navbar">
+      <header 
+        className="navbar" 
+        style={{ 
+          height: settings.navbarHeight || '76px',
+          background: settings.navbarBgColor || 'rgba(255, 255, 255, 0.9)'
+        }}
+      >
         <div className="container navbar-content">
           <Link to="/" className="brand">
             {settings.logoImage && (
-              <img src={settings.logoImage} alt={settings.siteName} className="brand-logo" />
+              <img 
+                src={settings.logoImage} 
+                alt={settings.siteName} 
+                className="brand-logo" 
+                style={{ height: settings.logoHeight || '64px' }}
+              />
             )}
             {(!settings.logoImage || settings.siteName) && (
               <span className="brand-name">{settings.siteName || 'ZAUQ'}</span>
@@ -54,10 +73,11 @@ function Navbar() {
       {/* WhatsApp Button */}
       {settings.showWhatsApp && settings.whatsappNumber && (
         <a 
-          href={`https://wa.me/${settings.whatsappNumber.replace(/\+/g, '')}`} 
+          href={`https://wa.me/${settings.whatsappNumber.replace(/\D/g, '')}`} 
           target="_blank" 
           rel="noopener noreferrer" 
           className="whatsapp-float"
+          style={{ z-index: 99999 }}
           aria-label="Contact on WhatsApp"
         >
           <Phone size={24} />

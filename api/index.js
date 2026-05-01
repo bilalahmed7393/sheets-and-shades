@@ -87,6 +87,15 @@ const settingsSchema = new mongoose.Schema({
   // Shipping Settings
   shippingFlatRate: { type: Number, default: 200 },
   shippingFreeThreshold: { type: Number, default: 3000 },
+  // Announcement Bar Advanced
+  announcementFontSize: { type: String, default: '14px' },
+  announcementPadding: { type: String, default: '10px' },
+  announcementBgColor: { type: String, default: '#2d6a4f' },
+  announcementTextColor: { type: String, default: '#ffffff' },
+  // Navbar Advanced
+  navbarHeight: { type: String, default: '76px' },
+  navbarBgColor: { type: String, default: 'rgba(255, 255, 255, 0.9)' },
+  logoHeight: { type: String, default: '64px' },
   // Admin
   adminUsername: { type: String, default: 'zauq_admin' },
   adminPassword: { type: String, default: 'zauq2024!' }

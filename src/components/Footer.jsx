@@ -11,9 +11,9 @@ function Footer() {
           <h3>{settings.siteName || 'ZAUQ'}</h3>
           <p className="text-muted" style={{ marginBottom: '1.5rem' }}>{settings.siteTagline || 'Premium bedding and curtains for your home.'}</p>
           <div className="footer-socials" style={{ display: 'flex', gap: '1rem' }}>
-            {settings.facebookUrl && <a href={settings.facebookUrl} target="_blank" rel="noopener noreferrer" className="social-link">Facebook</a>}
-            {settings.instagramUrl && <a href={settings.instagramUrl} target="_blank" rel="noopener noreferrer" className="social-link">Instagram</a>}
-            {settings.tiktokUrl && <a href={settings.tiktokUrl} target="_blank" rel="noopener noreferrer" className="social-link">TikTok</a>}
+            {settings.facebookUrl && <a href={settings.facebookUrl.startsWith('http') ? settings.facebookUrl : `https://${settings.facebookUrl}`} target="_blank" rel="noopener noreferrer" className="social-link">Facebook</a>}
+            {settings.instagramUrl && <a href={settings.instagramUrl.startsWith('http') ? settings.instagramUrl : `https://${settings.instagramUrl}`} target="_blank" rel="noopener noreferrer" className="social-link">Instagram</a>}
+            {settings.tiktokUrl && <a href={settings.tiktokUrl.startsWith('http') ? settings.tiktokUrl : `https://${settings.tiktokUrl}`} target="_blank" rel="noopener noreferrer" className="social-link">TikTok</a>}
           </div>
         </div>
         <div className="footer-links">

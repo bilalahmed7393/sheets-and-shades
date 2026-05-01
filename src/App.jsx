@@ -6,6 +6,7 @@ import Home from './pages/Home'
 import Shop from './pages/Shop'
 import Admin from './pages/Admin'
 import InfoPage from './pages/InfoPage'
+import ProductDetail from './pages/ProductDetail'
 import CartDrawer from './components/CartDrawer'
 import CheckoutModal from './components/CheckoutModal'
 
@@ -23,6 +24,7 @@ function App() {
         <Routes>
           <Route path="/" element={<Home />} />
           <Route path="/shop" element={<Shop />} />
+          <Route path="/product/:id" element={<ProductDetail />} />
           <Route path="/faq" element={<InfoPage title="Frequently Asked Questions" type="faq" />} />
           <Route path="/shipping" element={<InfoPage title="Shipping & Returns" type="shipping" />} />
           <Route path="/contact" element={<InfoPage title="Contact Us" type="contact" />} />
