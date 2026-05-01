@@ -77,7 +77,7 @@ function Navbar() {
           target="_blank" 
           rel="noopener noreferrer" 
           className="whatsapp-float"
-          style={{ z-index: 99999 }}
+          style={{ zIndex: 99999 }}
           aria-label="Contact on WhatsApp"
         >
           <Phone size={24} />
