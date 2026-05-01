@@ -53,7 +53,7 @@ function Home() {
               <div className="trust-icon"><Truck size={22} /></div>
               <div className="trust-text">
                 <h4>Free Shipping</h4>
-                <p>On orders above PKR {settings.freeShippingThreshold || '5,000'}</p>
+                <p>On orders above PKR {settings.shippingFreeThreshold || '3,000'}</p>
               </div>
             </div>
             <div className="trust-item">

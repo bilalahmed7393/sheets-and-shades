@@ -8,8 +8,8 @@ function Footer() {
     <footer className="footer">
       <div className="container footer-content">
         <div className="footer-brand">
-          <h3>{settings.siteName}</h3>
-          <p className="text-muted">{settings.aboutText}</p>
+          <h3>{settings.siteName || 'ZAUQ'}</h3>
+          <p className="text-muted">{settings.siteTagline || 'Premium bedding and curtains for your home.'}</p>
         </div>
         <div className="footer-links">
           <h4>Shop</h4>

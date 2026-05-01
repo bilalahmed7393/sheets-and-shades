@@ -109,7 +109,7 @@ function Admin() {
       img.src = event.target.result;
       img.onload = () => {
         const canvas = document.createElement('canvas');
-        const MAX_WIDTH = 1600; // Larger max width for hero background
+        const MAX_WIDTH = 1600;
         const MAX_HEIGHT = 1200;
         let width = img.width;
         let height = img.height;
@@ -130,11 +130,32 @@ function Admin() {
         canvas.height = height;
         const ctx = canvas.getContext('2d');
         ctx.drawImage(img, 0, 0, width, height);
-
+        
         const dataUrl = canvas.toDataURL('image/jpeg', 0.8);
         setSettingsForm({ ...settingsForm, [field]: dataUrl });
       };
     };
+  };
+
+  const removeSettingsImage = (field) => {
+    setSettingsForm({ ...settingsForm, [field]: '' });
+  };
+
+  const addFaqItem = () => {
+    const newFaq = [...(settingsForm.faq || []), { question: '', answer: '' }];
+    setSettingsForm({ ...settingsForm, faq: newFaq });
+  };
+
+  const removeFaqItem = (index) => {
+    const newFaq = (settingsForm.faq || []).filter((_, i) => i !== index);
+    setSettingsForm({ ...settingsForm, faq: newFaq });
+  };
+
+  const updateFaqItem = (index, field, value) => {
+    const newFaq = settingsForm.faq.map((item, i) => 
+      i === index ? { ...item, [field]: value } : item
+    );
+    setSettingsForm({ ...settingsForm, faq: newFaq });
   };
 
   // Modal helpers
@@ -714,7 +735,7 @@ function Admin() {
                     <div className="toggle-switch">
                       <input 
                         type="checkbox" 
-                        checked={settingsForm.showAnnouncement} 
+                        checked={settingsForm.showAnnouncement || false} 
                         onChange={e => setSettingsForm({...settingsForm, showAnnouncement: e.target.checked})} 
                       />
                       <span className="toggle-slider"></span>
@@ -737,7 +758,7 @@ function Admin() {
                     {settingsForm.logoImage && (
                       <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', marginTop: '0.75rem' }}>
                         <img src={settingsForm.logoImage} alt="Logo" style={{ height: '40px', objectFit: 'contain' }} />
-                        <button type="button" className="btn-icon danger" onClick={() => setSettingsForm({...settingsForm, logoImage: ''})}>
+                        <button type="button" className="btn-icon danger" onClick={() => removeSettingsImage('logoImage')}>
                           <Trash2 size={14} />
                         </button>
                       </div>
@@ -745,7 +766,7 @@ function Admin() {
                   </div>
                   <div className="form-group">
                     <label>Site Name</label>
-                    <input type="text" value={settingsForm.siteName} onChange={e => setSettingsForm({...settingsForm, siteName: e.target.value})} required />
+                    <input type="text" value={settingsForm.siteName || ''} onChange={e => setSettingsForm({...settingsForm, siteName: e.target.value})} required />
                   </div>
                 </div>
                 <div className="form-group-v2" style={{ marginTop: '1rem' }}>
@@ -753,7 +774,7 @@ function Admin() {
                     <div className="toggle-switch">
                       <input 
                         type="checkbox" 
-                        checked={settingsForm.showWhatsApp} 
+                        checked={settingsForm.showWhatsApp || false} 
                         onChange={e => setSettingsForm({...settingsForm, showWhatsApp: e.target.checked})} 
                       />
                       <span className="toggle-slider"></span>
@@ -768,15 +789,22 @@ function Admin() {
                 <div className="form-group">
                   <label>Hero Background Image</label>
                   <input type="file" accept="image/*" onChange={(e) => handleSettingsImageUpload(e, 'heroBackgroundImage')} />
-                  {settingsForm.heroBackgroundImage && <img src={settingsForm.heroBackgroundImage} alt="Hero Preview" className="image-preview" style={{ height: '150px', width: '100%', objectFit: 'cover', borderRadius: '0.5rem', marginTop: '0.75rem' }} />}
+                  {settingsForm.heroBackgroundImage && (
+                    <div style={{ position: 'relative', marginTop: '0.75rem' }}>
+                      <img src={settingsForm.heroBackgroundImage} alt="Hero Preview" className="image-preview" style={{ height: '150px', width: '100%', objectFit: 'cover', borderRadius: '0.5rem' }} />
+                      <button type="button" className="btn-icon danger" style={{ position: 'absolute', top: '10px', right: '10px', background: '#ef4444', color: '#fff' }} onClick={() => removeSettingsImage('heroBackgroundImage')}>
+                        <Trash2 size={14} />
+                      </button>
+                    </div>
+                  )}
                 </div>
                 <div className="form-group">
                   <label>Hero Headline</label>
-                  <input type="text" value={settingsForm.heroHeadline} onChange={e => setSettingsForm({...settingsForm, heroHeadline: e.target.value})} required />
+                  <input type="text" value={settingsForm.heroHeadline || ''} onChange={e => setSettingsForm({...settingsForm, heroHeadline: e.target.value})} required />
                 </div>
                 <div className="form-group">
                   <label>Hero Subtitle</label>
-                  <textarea value={settingsForm.heroSubtitle} onChange={e => setSettingsForm({...settingsForm, heroSubtitle: e.target.value})} required />
+                  <textarea value={settingsForm.heroSubtitle || ''} onChange={e => setSettingsForm({...settingsForm, heroSubtitle: e.target.value})} required />
                 </div>
                 <div className="form-grid">
                   <div className="form-group">
@@ -791,19 +819,67 @@ function Admin() {
               </div>
 
               <div className="admin-section-box">
-                <h3 className="section-title">Support Pages Content</h3>
-                <p style={{ color: '#8b8e96', fontSize: '0.85rem', marginBottom: '1.5rem' }}>Use basic HTML tags for formatting if needed.</p>
+                <h3 className="section-title">Frequently Asked Questions (FAQ)</h3>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+                  {settingsForm.faq?.map((item, index) => (
+                    <div key={index} style={{ background: '#1a1d23', padding: '1rem', borderRadius: '0.5rem', border: '1px solid #33363e' }}>
+                      <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '0.75rem' }}>
+                        <span style={{ fontSize: '0.8rem', color: '#8b8e96', fontWeight: 600 }}>Question #{index + 1}</span>
+                        <button type="button" onClick={() => removeFaqItem(index)} style={{ background: 'none', border: 'none', color: '#ef4444', cursor: 'pointer' }}>
+                          <Trash2 size={14} />
+                        </button>
+                      </div>
+                      <div className="form-group">
+                        <input 
+                          type="text" 
+                          placeholder="Enter question" 
+                          value={item.question} 
+                          onChange={(e) => updateFaqItem(index, 'question', e.target.value)} 
+                          style={{ marginBottom: '0.5rem' }}
+                        />
+                        <textarea 
+                          placeholder="Enter answer" 
+                          value={item.answer} 
+                          onChange={(e) => updateFaqItem(index, 'answer', e.target.value)}
+                          rows={3}
+                        />
+                      </div>
+                    </div>
+                  ))}
+                  <button type="button" className="btn-admin secondary" onClick={addFaqItem} style={{ width: 'fit-content' }}>
+                    <Plus size={14} /> Add FAQ Item
+                  </button>
+                </div>
+              </div>
+
+              <div className="admin-section-box">
+                <h3 className="section-title">Shipping & Returns Policies</h3>
                 <div className="form-group">
-                  <label>FAQ Content</label>
-                  <textarea value={settingsForm.faqContent || ''} onChange={e => setSettingsForm({...settingsForm, faqContent: e.target.value})} rows={6} />
+                  <label>Shipping Policy</label>
+                  <textarea 
+                    value={settingsForm.shippingPolicy || ''} 
+                    onChange={e => setSettingsForm({...settingsForm, shippingPolicy: e.target.value})} 
+                    rows={4} 
+                    placeholder="Describe your shipping process and timelines..."
+                  />
                 </div>
                 <div className="form-group">
-                  <label>Shipping & Returns Content</label>
-                  <textarea value={settingsForm.shippingContent || ''} onChange={e => setSettingsForm({...settingsForm, shippingContent: e.target.value})} rows={6} />
+                  <label>Return Policy</label>
+                  <textarea 
+                    value={settingsForm.returnPolicy || ''} 
+                    onChange={e => setSettingsForm({...settingsForm, returnPolicy: e.target.value})} 
+                    rows={4}
+                    placeholder="Describe your return and refund policy..."
+                  />
                 </div>
                 <div className="form-group">
-                  <label>Contact Content</label>
-                  <textarea value={settingsForm.contactContent || ''} onChange={e => setSettingsForm({...settingsForm, contactContent: e.target.value})} rows={6} />
+                  <label>Delivery Estimate Message</label>
+                  <input 
+                    type="text" 
+                    value={settingsForm.deliveryEstimate || ''} 
+                    onChange={e => setSettingsForm({...settingsForm, deliveryEstimate: e.target.value})}
+                    placeholder="e.g. 3-5 business days"
+                  />
                 </div>
               </div>
 
@@ -837,7 +913,11 @@ function Admin() {
                   </div>
                   <div className="form-group">
                     <label>Store Address</label>
-                    <input type="text" value={settingsForm.storeAddress || ''} onChange={e => setSettingsForm({...settingsForm, storeAddress: e.target.value})} />
+                    <input type="text" value={settingsForm.contactAddress || ''} onChange={e => setSettingsForm({...settingsForm, contactAddress: e.target.value})} />
+                  </div>
+                  <div className="form-group full-width">
+                    <label>Working Hours</label>
+                    <input type="text" value={settingsForm.contactWorkingHours || ''} onChange={e => setSettingsForm({...settingsForm, contactWorkingHours: e.target.value})} placeholder="e.g. Mon-Sat: 10am - 8pm" />
                   </div>
                 </div>
               </div>
@@ -885,11 +965,11 @@ function Admin() {
                 <div className="form-grid">
                   <div className="form-group">
                     <label>Free Shipping Threshold (PKR)</label>
-                    <input type="number" value={settingsForm.freeShippingThreshold || '5000'} onChange={e => setSettingsForm({...settingsForm, freeShippingThreshold: e.target.value})} />
+                    <input type="number" value={settingsForm.shippingFreeThreshold || '3000'} onChange={e => setSettingsForm({...settingsForm, shippingFreeThreshold: e.target.value})} />
                   </div>
                   <div className="form-group">
                     <label>Standard Shipping Fee (PKR)</label>
-                    <input type="number" value={settingsForm.shippingFee || '250'} onChange={e => setSettingsForm({...settingsForm, shippingFee: e.target.value})} />
+                    <input type="number" value={settingsForm.shippingFlatRate || '200'} onChange={e => setSettingsForm({...settingsForm, shippingFlatRate: e.target.value})} />
                   </div>
                 </div>
               </div>

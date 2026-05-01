@@ -23,9 +23,9 @@ function App() {
         <Routes>
           <Route path="/" element={<Home />} />
           <Route path="/shop" element={<Shop />} />
-          <Route path="/faq" element={<InfoPage title="Frequently Asked Questions" contentKey="faqContent" />} />
-          <Route path="/shipping" element={<InfoPage title="Shipping & Returns" contentKey="shippingContent" />} />
-          <Route path="/contact" element={<InfoPage title="Contact Us" contentKey="contactContent" />} />
+          <Route path="/faq" element={<InfoPage title="Frequently Asked Questions" type="faq" />} />
+          <Route path="/shipping" element={<InfoPage title="Shipping & Returns" type="shipping" />} />
+          <Route path="/contact" element={<InfoPage title="Contact Us" type="contact" />} />
           <Route path="/admin" element={<Admin />} />
         </Routes>
       </main>

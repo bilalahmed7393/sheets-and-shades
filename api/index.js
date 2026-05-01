@@ -49,19 +49,15 @@ const settingsSchema = new mongoose.Schema({
   // Hero
   heroHeadline: { type: String, default: 'Curated Comfort for Your Home' },
   heroSubtitle: { type: String, default: 'Discover our premium collection of pre-loved and new bedsheets and curtains.' },
-  heroBackgroundImage: { type: String, default: 'https://images.unsplash.com/photo-1616046229478-9901c5536a45?ixlib=rb-4.0.3&auto=format&fit=crop&w=1600&q=80' },
+  heroBackgroundImage: { type: String, default: '' },
   heroCta1Text: { type: String, default: 'Shop Collection' },
   heroCta1Link: { type: String, default: '/shop' },
-  heroCta2Text: { type: String, default: 'Contact Us' },
-  heroCta2Link: { type: String, default: '/contact' },
   // Announcement Bar
-  announcementEnabled: { type: Boolean, default: false },
+  showAnnouncement: { type: Boolean, default: false },
   announcementText: { type: String, default: '🎉 Free shipping on orders above PKR 3,000!' },
-  announcementBgColor: { type: String, default: '#2d6a4f' },
-  announcementLink: { type: String, default: '/shop' },
   // Category images
-  categoryImage1: { type: String, default: 'https://images.unsplash.com/photo-1522771731478-40b95bc8e4f1?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80' },
-  categoryImage2: { type: String, default: 'https://images.unsplash.com/photo-1513694203232-719a280e022f?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80' },
+  categoryImage1: { type: String, default: '' },
+  categoryImage2: { type: String, default: '' },
   // About
   aboutText: { type: String, default: 'A marketplace for premium bedsheets and curtains.' },
   // Theme
@@ -69,35 +65,28 @@ const settingsSchema = new mongoose.Schema({
   secondaryColor: { type: String, default: '#b5941f' },
   backgroundColor: { type: String, default: '#faf9f6' },
   textColor: { type: String, default: '#1a2e1f' },
-  // Support Pages
-  faqContent: { type: String, default: '' },
-  shippingContent: { type: String, default: '' },
-  contactContent: { type: String, default: '' },
+  // Support Pages (Structured)
+  faq: [{
+    question: { type: String, default: '' },
+    answer: { type: String, default: '' }
+  }],
+  shippingPolicy: { type: String, default: '' },
+  returnPolicy: { type: String, default: '' },
+  deliveryEstimate: { type: String, default: '3-5 business days' },
+  contactEmail: { type: String, default: '' },
+  contactPhone: { type: String, default: '' },
+  contactAddress: { type: String, default: '' },
+  contactWorkingHours: { type: String, default: '' },
   // WhatsApp
-  whatsappEnabled: { type: Boolean, default: false },
+  showWhatsApp: { type: Boolean, default: false },
   whatsappNumber: { type: String, default: '' },
   // Social
-  socialInstagram: { type: String, default: '' },
-  socialFacebook: { type: String, default: '' },
-  socialTiktok: { type: String, default: '' },
-  // Footer
-  footerTagline: { type: String, default: 'Premium bedding and curtains for your home.' },
-  footerAddress: { type: String, default: '' },
-  footerPhone: { type: String, default: '' },
-  footerEmail: { type: String, default: '' },
-  copyrightText: { type: String, default: '' },
-  // Shipping settings
+  facebookUrl: { type: String, default: '' },
+  instagramUrl: { type: String, default: '' },
+  tiktokUrl: { type: String, default: '' },
+  // Shipping Settings
   shippingFlatRate: { type: Number, default: 200 },
-  shippingFreeEnabled: { type: Boolean, default: true },
   shippingFreeThreshold: { type: Number, default: 3000 },
-  shippingEstimate: { type: String, default: '3-5 business days' },
-  // Payment settings
-  paymentCodEnabled: { type: Boolean, default: true },
-  paymentBankEnabled: { type: Boolean, default: false },
-  bankName: { type: String, default: '' },
-  bankAccountTitle: { type: String, default: '' },
-  bankAccountNumber: { type: String, default: '' },
-  bankIban: { type: String, default: '' },
   // Admin
   adminUsername: { type: String, default: 'zauq_admin' },
   adminPassword: { type: String, default: 'zauq2024!' }
