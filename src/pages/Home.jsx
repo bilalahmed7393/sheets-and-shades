@@ -1,11 +1,17 @@
 import { Link } from 'react-router-dom';
+import { useState, useEffect } from 'react';
 import { ArrowRight } from 'lucide-react';
 import ProductCard from '../components/ProductCard';
 import { getProducts } from '../data';
 import './Home.css';
 
 function Home() {
-  const products = getProducts();
+  const [products, setProducts] = useState([]);
+
+  useEffect(() => {
+    getProducts().then(setProducts);
+  }, []);
+
   const featuredProducts = products.slice(0, 4);
 
   return (

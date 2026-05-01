@@ -4,7 +4,7 @@ import {
   Download, Upload, RotateCcw, X, Package,
   ShoppingBag, Layers, Heart, CheckCircle, AlertCircle
 } from 'lucide-react';
-import { getProducts, saveProducts, getNextId, exportProducts, importProducts, resetProducts, defaultProducts } from '../data';
+import { getProducts, addProduct, updateProduct, deleteProduct, getNextId, exportProducts, importProducts, resetProducts, defaultProducts } from '../data';
 import './Admin.css';
 
 const ADMIN_PASSWORD = 'admin123';
@@ -28,7 +28,7 @@ function Admin() {
 
   useEffect(() => {
     if (isLoggedIn) {
-      setProducts(getProducts());
+      getProducts().then(setProducts);
     }
   }, [isLoggedIn]);
 
@@ -82,40 +82,42 @@ function Admin() {
   };
 
   // CRUD
-  const handleSave = (e) => {
+  const handleSave = async (e) => {
     e.preventDefault();
     if (!formData.name || !formData.price) return;
 
-    let updated;
-    if (editingProduct) {
-      updated = products.map(p =>
-        p.id === editingProduct.id
-          ? { ...p, ...formData, price: parseFloat(formData.price) }
-          : p
-      );
-      showToast(`"${formData.name}" updated successfully`);
-    } else {
-      const newProduct = {
-        id: getNextId(products),
-        ...formData,
-        price: parseFloat(formData.price)
-      };
-      updated = [...products, newProduct];
-      showToast(`"${formData.name}" added successfully`);
+    try {
+      if (editingProduct) {
+        const productToUpdate = { ...editingProduct, ...formData, price: parseFloat(formData.price) };
+        const updatedProduct = await updateProduct(productToUpdate);
+        setProducts(products.map(p => p.id === updatedProduct.id ? updatedProduct : p));
+        showToast(`"${formData.name}" updated successfully`);
+      } else {
+        const newProduct = {
+          id: getNextId(products),
+          ...formData,
+          price: parseFloat(formData.price)
+        };
+        const savedProduct = await addProduct(newProduct);
+        setProducts([...products, savedProduct]);
+        showToast(`"${formData.name}" added successfully`);
+      }
+      closeModal();
+    } catch (err) {
+      showToast(err.message, 'error');
     }
-
-    setProducts(updated);
-    saveProducts(updated);
-    closeModal();
   };
 
-  const handleDelete = (id) => {
-    const product = products.find(p => p.id === id);
-    const updated = products.filter(p => p.id !== id);
-    setProducts(updated);
-    saveProducts(updated);
-    setDeleteConfirm(null);
-    showToast(`"${product.name}" deleted`);
+  const handleDelete = async (id) => {
+    try {
+      const product = products.find(p => p.id === id);
+      await deleteProduct(id);
+      setProducts(products.filter(p => p.id !== id));
+      setDeleteConfirm(null);
+      showToast(`"${product.name}" deleted`);
+    } catch (err) {
+      showToast(err.message, 'error');
+    }
   };
 
   // Import / Export / Reset
@@ -132,10 +134,14 @@ function Admin() {
     e.target.value = '';
   };
 
-  const handleReset = () => {
-    resetProducts();
-    setProducts([...defaultProducts]);
-    showToast('Catalog reset to defaults');
+  const handleReset = async () => {
+    try {
+      await resetProducts();
+      setProducts([...defaultProducts]);
+      showToast('Catalog reset to defaults');
+    } catch (err) {
+      showToast(err.message, 'error');
+    }
   };
 
   // Filter products by search

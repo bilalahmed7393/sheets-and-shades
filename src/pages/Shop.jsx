@@ -6,6 +6,7 @@ import { getProducts } from '../data';
 import './Shop.css';
 
 function Shop() {
+  const [products, setProducts] = useState([]);
   const [searchParams] = useSearchParams();
   const initialCategory = searchParams.get('category');
   const initialCondition = searchParams.get('condition');
@@ -13,6 +14,10 @@ function Shop() {
   const products = getProducts();
   const [filterCategory, setFilterCategory] = useState(initialCategory || 'All');
   const [filterCondition, setFilterCondition] = useState(initialCondition || 'All');
+
+  useEffect(() => {
+    getProducts().then(setProducts);
+  }, []);
 
   useEffect(() => {
     if (initialCategory) setFilterCategory(initialCategory.charAt(0).toUpperCase() + initialCategory.slice(1));

@@ -55,32 +55,58 @@ export const defaultProducts = [
   }
 ];
 
-const STORAGE_KEY = 'sheets_and_shades_products';
+const API_BASE = '/api/products';
 
 /**
- * Get all products. Reads from localStorage first, falls back to defaults.
+ * Fetch all products from the backend.
  */
-export function getProducts() {
+export async function getProducts() {
   try {
-    const stored = localStorage.getItem(STORAGE_KEY);
-    if (stored) {
-      return JSON.parse(stored);
-    }
+    const res = await fetch(API_BASE);
+    if (!res.ok) throw new Error('Failed to fetch products');
+    const data = await res.json();
+    return data.length > 0 ? data : [...defaultProducts];
   } catch (e) {
-    console.warn('Failed to read products from localStorage:', e);
+    console.error('API Fetch Error:', e);
+    return [...defaultProducts];
   }
-  return [...defaultProducts];
 }
 
 /**
- * Save the full product array to localStorage.
+ * Add a new product to the backend.
  */
-export function saveProducts(products) {
-  try {
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(products));
-  } catch (e) {
-    console.error('Failed to save products to localStorage:', e);
-  }
+export async function addProduct(product) {
+  const res = await fetch(API_BASE, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(product)
+  });
+  if (!res.ok) throw new Error('Failed to add product');
+  return res.json();
+}
+
+/**
+ * Update a product on the backend.
+ */
+export async function updateProduct(product) {
+  const res = await fetch(`${API_BASE}/${product.id}`, {
+    method: 'PUT',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(product)
+  });
+  if (!res.ok) throw new Error('Failed to update product');
+  return res.json();
+}
+
+/**
+ * Delete a product on the backend.
+ */
+export async function deleteProduct(id) {
+  const res = await fetch(`${API_BASE}/${id}`, {
+    method: 'DELETE'
+  });
+  if (!res.ok) throw new Error('Failed to delete product');
+  return res.json();
 }
 
 /**
@@ -94,8 +120,8 @@ export function getNextId(products) {
 /**
  * Export products as a downloadable JSON file.
  */
-export function exportProducts() {
-  const products = getProducts();
+export async function exportProducts() {
+  const products = await getProducts();
   const blob = new Blob([JSON.stringify(products, null, 2)], { type: 'application/json' });
   const url = URL.createObjectURL(blob);
   const a = document.createElement('a');
@@ -108,22 +134,28 @@ export function exportProducts() {
 }
 
 /**
- * Import products from a JSON file. Returns a promise that resolves with the imported products.
+ * Import products from a JSON file.
  */
 export function importProducts(file) {
   return new Promise((resolve, reject) => {
     const reader = new FileReader();
-    reader.onload = (e) => {
+    reader.onload = async (e) => {
       try {
         const products = JSON.parse(e.target.result);
         if (!Array.isArray(products)) {
           reject(new Error('Invalid format: expected an array of products.'));
           return;
         }
-        saveProducts(products);
-        resolve(products);
+        const res = await fetch(`${API_BASE}/batch`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(products)
+        });
+        if (!res.ok) throw new Error('Failed to batch import products');
+        const saved = await res.json();
+        resolve(saved);
       } catch (err) {
-        reject(new Error('Invalid JSON file.'));
+        reject(err);
       }
     };
     reader.onerror = () => reject(new Error('Failed to read file.'));
@@ -132,8 +164,12 @@ export function importProducts(file) {
 }
 
 /**
- * Reset products back to defaults.
+ * Reset products back to defaults (client-side only for demo purposes)
  */
-export function resetProducts() {
-  localStorage.removeItem(STORAGE_KEY);
+export async function resetProducts() {
+  await fetch(`${API_BASE}/batch`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(defaultProducts)
+  });
 }
