@@ -32,7 +32,7 @@ const Product = mongoose.models.Product || mongoose.model('Product', productSche
 // Settings Schema
 const settingsSchema = new mongoose.Schema({
   id: { type: String, default: 'global' },
-  siteName: { type: String, default: 'Sheets & Shades' },
+  siteName: { type: String, default: 'ZAUQ Bedding & More' },
   heroHeadline: { type: String, default: 'Curated Comfort for Your Home' },
   heroSubtitle: { type: String, default: 'Discover our premium collection of pre-loved and new bedsheets and curtains.' },
   aboutText: { type: String, default: 'A marketplace for premium bedsheets and curtains.' },

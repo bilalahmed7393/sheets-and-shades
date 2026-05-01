@@ -185,7 +185,7 @@ export async function getSettings() {
   } catch (e) {
     console.error('API Fetch Error:', e);
     return {
-      siteName: 'Sheets & Shades',
+      siteName: 'ZAUQ Bedding & More',
       heroHeadline: 'Curated Comfort for Your Home',
       heroSubtitle: 'Discover our premium collection of pre-loved and new bedsheets and curtains.',
       aboutText: 'A marketplace for premium bedsheets and curtains.'
