@@ -1,17 +1,17 @@
 import { useState, useEffect, useRef } from 'react';
+import { Link } from 'react-router-dom';
 import {
   Lock, LogOut, Plus, Pencil, Trash2, Search,
   X, Package, ShoppingBag, Layers, Heart,
   CheckCircle, AlertCircle, Settings as SettingsIcon,
   ClipboardList, ChevronDown, Eye, LayoutDashboard,
-  FileText, ExternalLink, TrendingUp, AlertTriangle
+  FileText, ExternalLink, TrendingUp, AlertTriangle, RefreshCw
 } from 'lucide-react';
 import { getProducts, addProduct, updateProduct, deleteProduct, getNextId, updateSettings, getOrders, updateOrderStatus, deleteOrder as deleteOrderApi, getDashboardStats } from '../data';
 import { useSiteSettings } from '../SiteContext';
 import './Admin.css';
 
-const ADMIN_USERNAME = 'zauq_admin';
-const ADMIN_PASSWORD = 'zauq2024!';
+// Admin authentication is now handled dynamically via settings fetched from DB
 
 function Admin() {
   const [isLoggedIn, setIsLoggedIn] = useState(() => sessionStorage.getItem('admin_auth') === 'true');
@@ -72,12 +72,32 @@ function Admin() {
   // Login
   const handleLogin = (e) => {
     e.preventDefault();
-    if (username === ADMIN_USERNAME && password === ADMIN_PASSWORD) {
+    // Default to hardcoded if settings not loaded yet, but try to use settings
+    const validUser = settings.adminUsername || 'zauq_admin';
+    const validPass = settings.adminPassword || 'zauq2024!';
+    
+    if (username === validUser && password === validPass) {
       sessionStorage.setItem('admin_auth', 'true');
       setIsLoggedIn(true);
       setLoginError('');
+      showToast('Welcome back, Admin!');
     } else {
       setLoginError('Invalid username or password.');
+    }
+  };
+
+  const handleSync = async () => {
+    try {
+      showToast('Syncing data...', 'success');
+      const prods = await getProducts();
+      setProducts(prods);
+      const ords = await getOrders();
+      setOrders(ords);
+      const stats = await getDashboardStats();
+      setDashStats(stats);
+      showToast('Data synced successfully', 'success');
+    } catch (err) {
+      showToast('Sync failed: ' + err.message, 'error');
     }
   };
 
@@ -423,18 +443,25 @@ function Admin() {
           </button>
         </nav>
         <div className="sidebar-footer">
-          <button className="btn-admin secondary" style={{ width: '100%' }} onClick={handleLogout}><LogOut size={14} /> Logout</button>
+          <Link to="/" target="_blank" className="sidebar-link">
+            <ExternalLink size={18} /> <span>View Store</span>
+          </Link>
         </div>
       </aside>
 
       {/* Content */}
-      <div className="admin-content">
-        <div className="admin-topbar">
-          <h1>{tabLabel[activeTab] || 'Admin'}</h1>
+      <main className="admin-content">
+        <header className="admin-topbar">
+          <h1>{tabLabel[activeTab]}</h1>
           <div className="topbar-actions">
-            <a href="/" target="_blank" rel="noopener noreferrer" className="btn-admin secondary"><ExternalLink size={14} /> View Site</a>
+            <button className="btn-admin secondary" onClick={handleSync} title="Refresh all data">
+              <RefreshCw size={14} /> Sync
+            </button>
+            <button className="btn-admin secondary danger" onClick={handleLogout}>
+              <LogOut size={14} /> Logout
+            </button>
           </div>
-        </div>
+        </header>
         <div className="admin-body">
 
         {/* DASHBOARD */}
@@ -972,6 +999,24 @@ function Admin() {
                     <input type="number" value={settingsForm.shippingFlatRate || '200'} onChange={e => setSettingsForm({...settingsForm, shippingFlatRate: e.target.value})} />
                   </div>
                 </div>
+              </div>
+
+              <div className="admin-section-box">
+                <h3 className="section-title">Admin Account Credentials</h3>
+                <div className="form-grid">
+                  <div className="form-group">
+                    <label>Admin Username</label>
+                    <input type="text" value={settingsForm.adminUsername || ''} onChange={e => setSettingsForm({...settingsForm, adminUsername: e.target.value})} />
+                  </div>
+                  <div className="form-group">
+                    <label>Admin Password</label>
+                    <input type="password" value={settingsForm.adminPassword || ''} onChange={e => setSettingsForm({...settingsForm, adminPassword: e.target.value})} />
+                  </div>
+                </div>
+                <p style={{ fontSize: '0.75rem', color: '#8b8e96', marginTop: '0.5rem' }}>
+                  <AlertTriangle size={12} style={{ verticalAlign: 'middle', marginRight: '4px' }} /> 
+                  Be careful when changing these. You will need the new credentials for next login.
+                </p>
               </div>
 
               <div style={{ display: 'flex', justifyContent: 'flex-end', marginTop: '2rem' }}>

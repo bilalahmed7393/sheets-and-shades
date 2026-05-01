@@ -9,7 +9,12 @@ function Footer() {
       <div className="container footer-content">
         <div className="footer-brand">
           <h3>{settings.siteName || 'ZAUQ'}</h3>
-          <p className="text-muted">{settings.siteTagline || 'Premium bedding and curtains for your home.'}</p>
+          <p className="text-muted" style={{ marginBottom: '1.5rem' }}>{settings.siteTagline || 'Premium bedding and curtains for your home.'}</p>
+          <div className="footer-socials" style={{ display: 'flex', gap: '1rem' }}>
+            {settings.facebookUrl && <a href={settings.facebookUrl} target="_blank" rel="noopener noreferrer" className="social-link">Facebook</a>}
+            {settings.instagramUrl && <a href={settings.instagramUrl} target="_blank" rel="noopener noreferrer" className="social-link">Instagram</a>}
+            {settings.tiktokUrl && <a href={settings.tiktokUrl} target="_blank" rel="noopener noreferrer" className="social-link">TikTok</a>}
+          </div>
         </div>
         <div className="footer-links">
           <h4>Shop</h4>
