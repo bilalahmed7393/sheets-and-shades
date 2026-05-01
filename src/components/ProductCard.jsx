@@ -1,7 +1,9 @@
 import { ShoppingCart } from 'lucide-react';
+import { useCart } from '../CartContext';
 import './ProductCard.css';
 
 function ProductCard({ product }) {
+  const { addToCart } = useCart();
   return (
     <div className="product-card group">
       <div className="product-image-container">
@@ -12,7 +14,7 @@ function ProductCard({ product }) {
           </span>
         </div>
         <div className="product-actions">
-          <button className="btn btn-primary add-to-cart-btn">
+          <button className="btn btn-primary add-to-cart-btn" onClick={() => addToCart(product)}>
             <ShoppingCart size={18} />
             Add to Cart
           </button>

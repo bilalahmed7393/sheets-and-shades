@@ -22,8 +22,8 @@ function Home() {
       <section className="hero">
         <div className="hero-background">
           <img 
-            src="https://images.unsplash.com/photo-1616046229478-9901c5536a45?ixlib=rb-4.0.3&auto=format&fit=crop&w=1600&q=80" 
-            alt="Beautiful styled bedroom" 
+            src={settings.heroBackgroundImage} 
+            alt="Hero Background" 
             className="hero-image"
           />
           <div className="hero-overlay"></div>
@@ -44,14 +44,14 @@ function Home() {
       {/* Categories Section */}
       <section className="categories container">
         <div className="category-card">
-          <img src="https://images.unsplash.com/photo-1522771731478-40b95bc8e4f1?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80" alt="Bedsheets" />
+          <img src={settings.categoryImage1} alt="Bedsheets" />
           <div className="category-overlay">
             <h3>Luxury Bedsheets</h3>
             <Link to="/shop?category=bedsheets" className="btn btn-outline btn-light">Shop Sheets</Link>
           </div>
         </div>
         <div className="category-card">
-          <img src="https://images.unsplash.com/photo-1513694203232-719a280e022f?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80" alt="Curtains" />
+          <img src={settings.categoryImage2} alt="Curtains" />
           <div className="category-overlay">
             <h3>Elegant Curtains</h3>
             <Link to="/shop?category=curtains" className="btn btn-outline btn-light">Shop Curtains</Link>

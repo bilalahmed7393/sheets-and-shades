@@ -4,6 +4,7 @@ import Footer from './components/Footer'
 import Home from './pages/Home'
 import Shop from './pages/Shop'
 import Admin from './pages/Admin'
+import CartDrawer from './components/CartDrawer'
 
 function App() {
   const location = useLocation()
@@ -12,6 +13,7 @@ function App() {
   return (
     <div className="app">
       {!isAdmin && <Navbar />}
+      {!isAdmin && <CartDrawer />}
       <main>
         <Routes>
           <Route path="/" element={<Home />} />
